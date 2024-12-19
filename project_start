@@ -2,7 +2,7 @@
 script_version="1.11" # версия скрипта
 
 #настраиваемые параметры
-program_name="mygame"
+program_name="glfield"
 source_find_format="cpp"
 header_find_format="hpp"
 find_directory="./src/"

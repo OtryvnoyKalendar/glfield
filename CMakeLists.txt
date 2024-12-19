@@ -1,4 +1,3 @@
-
 cmake_minimum_required(VERSION 3.15)
 
 if(WIN32)
@@ -26,7 +25,7 @@ add_compile_options(
 	-Wall -Wextra -pedantic
 )
 
-set(COMMON_CODE_DIR "${PROJECT_SOURCE_DIR}./CommonCode")
+set(COMMON_CODE_DIR "./CommonCode")
 
 include_directories(src/game)
 include_directories(src/)

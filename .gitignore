@@ -3,7 +3,7 @@
 
 build/
 build.log
-cmakebin/
+bin/
 
 # Object files
 *.o

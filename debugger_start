@@ -1,0 +1,18 @@
+#!/bin/bash
+source ./project_start exit # версия зависит от этого скрипта; не меньше 1.11
+
+check_root_rights
+
+pid=$(pgrep $program_name)
+pgrep_result="$?"
+
+if [ $pgrep_result = "0" ]
+then
+	print_dashes
+	print_message $BLUE "Program PID: $pid, sctipt version: $script_version"
+	print_dashes
+	gdb -silent -pid $pid #./$program_name
+else
+	print_message $RED "Процесс $program_name не найден"
+fi
+

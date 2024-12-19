@@ -1,0 +1,241 @@
+#!/bin/bash
+script_version="1.11" # версия скрипта
+
+#настраиваемые параметры
+program_name="mygame"
+source_find_format="cpp"
+header_find_format="hpp"
+find_directory="./src/"
+compiler="clang++"
+lib_names="-lm -lGL -lsfml-window -lsfml-system"
+warnings="-Wall -Wextra -Wpedantic"
+standard="-std=c++17"
+log_file="build.log"
+
+#внутренняя логика
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+PURPLE='\033[0;35m'
+CYAN='\033[0;36m'
+NO_COLOR='\033[0m'
+
+debug_mode=""
+run_mode=""
+file_exists=false
+deleted_files="неизвестно"
+compiler_command_log=""
+
+found_sources=`find $find_directory -type f -name "*.$source_find_format" -printf "%p "`
+found_headers=`find $find_directory -type f -name "*.$header_find_format" -printf "%p "` # не используется
+include_dirs=`find $find_directory -name "*.$header_find_format" -exec dirname {} \; | sort -u | awk '{printf "-I%s ", $0}'`
+
+print_message() {
+	echo -e "${1}${2}${NO_COLOR}" # escape-последовательности
+}
+
+print_dashes() {
+	print_message $GREEN "----"
+}
+
+exec_is_exists() {
+	[ -f "$program_name" ]
+}
+
+check_root_rights() {
+	if [ "$(id -u)" -ne 0 ]; then
+		print_message $RED "Отладчик в отдельном окне должен быть запущен от имени root для подключения к процессу"
+		exit 1
+	fi
+
+	print_message $BLUE "Вы запустили скрипт с root правами"
+}
+
+handle_argument() {
+	if [ $# -ge 1 ]; then
+		case "$1" in
+			gdb)
+				# перестало рабоать
+				debug_mode="-ggdb3"
+				run_mode="new_window_debugger"
+				check_root_rights
+				;;
+			sgdb)
+				debug_mode="-g3"
+				run_mode="start_debugger"
+				;;
+			debug)
+				debug_mode="-g3"
+				run_mode="debug_compile"
+				;;
+			conly)
+				run_mode="compile_only"
+				;;
+			logly)
+				run_mode="log_only" # to read $ cat build.log
+				;;
+			exit)
+				run_mode="exit"
+				;;
+			cmake)
+				run_mode="cmake"
+				;;
+			cmakedebug)
+				run_mode="cmake"
+				debug_mode="on"
+				;;
+			*)
+				print_message $RED "Некорректный аргумент компиляции: $1"
+				;;
+		esac
+	fi
+}
+
+print_return() {
+	print_dashes
+	if [ "$return_value" = "0" ]; then
+		color=$GREEN
+	else
+		color=$RED
+	fi
+	print_message $color "Программа возвращает: $return_value" 
+}
+
+check_and_compile() {
+	print_message $GREEN "Статический анализатор cppcheck:"
+	cppcheck -q --enable=all --suppress=missingIncludeSystem --disable=information $found_sources $include_dirs
+	print_dashes
+
+	print_message $GREEN "Сообщения компилятора $compiler:"
+	compiler_command_log="$compiler $found_sources -o $program_name $warnings $include_dirs $standard $debug_mode $lib_names"
+	eval "$compiler_command_log"
+	print_dashes
+}
+
+run_program() {
+	print_message $NO_COLOR "Вот и начинается программа:"
+	print_dashes
+	./$program_name
+	return_value="$?"
+	print_return
+}
+
+#основная логика скрипта
+handle_argument $1
+# Обработчик сигнала INT при завершении через Ctrl+C
+trap 'echo "Программа была закрыта вручную, скрипт продолжил выполняться"' INT
+
+if [ "$run_mode" != "exit" ] && [ "$run_mode" != "cmake" ]
+then
+
+clear
+
+print_dashes
+print_message $GREEN "Скрипт project_start.v.$script_version:"
+
+if exec_is_exists
+then
+	rm "$program_name"
+	file_exists=true
+fi
+
+if [ "$run_mode" == "log_only" ]
+then
+	{
+		check_and_compile
+		print_message $GREEN "Команда компилятору:"
+		print_message $BLUE "$compiler_command_log"
+	} &> "$log_file"
+	print_message $GREEN "Лог компиляции сохранен в $log_file"
+else
+	check_and_compile
+fi
+
+start_program_with_mode() {
+	if [ "$run_mode" = "new_window_debugger" ]; then
+		echo 0 > /proc/sys/kernel/yama/ptrace_scope # разрешение на присоединение к процессам
+		gnome-terminal -- sh -c '
+		sleep 1;
+		pid=$(pgrep mycprog);
+		echo "PID: $pid";
+		gdb -silent ./mycprog -pid $pid;'
+		run_program
+		echo 1 > /proc/sys/kernel/yama/ptrace_scope # запрет на присоединение к процессам
+	elif [ "$run_mode" = "start_debugger" ]; then
+		gdb ./$program_name
+		return_value="неизвестно"
+		print_return
+	else
+		run_program
+	fi
+	
+	rm $program_name
+}
+
+if [ "$run_mode" != "compile_only" ] && [ "$run_mode" != "log_only" ]; then
+	if exec_is_exists; then
+		start_program_with_mode
+
+		if exec_is_exists; then
+			deleted_files="Исполняемый файл был удалён дважды"
+		else
+			deleted_files="Исполняемый файл был удалён после завершения работы программы"
+		fi
+	else
+		if exec_is_exists; then
+			deleted_files="Исполняемый файл был удалён только перед началом работы программы"
+		else
+			deleted_files="Исполняемых файлов найдено не было"
+		fi
+	fi
+else
+	# Повторно проверяем наличие файла
+	if exec_is_exists; then
+		deleted_files="Программа только скомпилировалась, исполняемый файл: '$program_name'"
+	else
+		deleted_files="Исполняемый файл не найден, ошибка компиляции"
+	fi
+fi
+
+print_message $BLUE "$deleted_files"
+print_dashes
+
+fi # run_mode != exit
+
+
+if [ "$run_mode" = "cmake" ]
+then
+	if [ -d "build" ]
+	then
+		print_dashes
+		print_message $BLUE "Запуск cmake"
+		print_dashes
+		cd build
+
+		if [ "$debug_mode" = "on" ]; then
+			cmake -DCMAKE_BUILD_TYPE=Debug ..
+		else
+			cmake ..
+		fi
+		cmake --build . # make
+
+		if [ "$?" = "0" ]
+		then
+			cd ../bin
+			if exec_is_exists
+			then
+				run_program
+				#rm $program_name
+			else
+				print_message $RED "Исполняемый файл не найден"
+			fi
+		else
+			print_message $RED "Ошибка компиляции или cmake сборки"
+		fi
+	else
+		mkdir build
+		print_message $RED "Директория build не найдена, поэтому должна быть создана новая директория build"
+	fi
+fi
+

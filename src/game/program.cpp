@@ -1,3 +1,5 @@
+#include <cmath>
+
 #include "program.hpp"
 #include "screen.hpp"
 #include "types.hpp"
@@ -48,9 +50,10 @@ void PlayerMove() {
 	if(!screen.window.hasFocus())
 		return;
 
-	const float jumpHeight{5.0};
-	const float gravity{0.1};
-	static float velocityY{0};
+	const float jumpHeight{4.0};
+	static float jump{0};
+	const float jumpPlus{0.04};
+	float dy{0};
 	
 	float playerHeight{1.7f};
 	int moveForvard{0};
@@ -65,18 +68,21 @@ void PlayerMove() {
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 		moveRight = 1;
 
-	if(velocityY <= 0) {
-		velocityY = 0;
-		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
-			velocityY += jumpHeight;
+	if(jump > 0 && jump < 1) {
+		jump += jumpPlus;
+		if(jump > 1)
+			jump = 0;
 	}
 	else {
-		velocityY -= gravity;
+		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+			jump += jumpPlus;
 	}
+
+	dy = std::sin(M_PI*jump)*jumpHeight;
 
 	camera.MoveDirection(moveForvard, moveRight);
 	camera.Apply();
-	camera.z = map.GetHeight(camera.x, camera.y) + playerHeight + velocityY;
+	camera.z = map.GetHeight(camera.x, camera.y) + playerHeight + dy;
 }
 
 

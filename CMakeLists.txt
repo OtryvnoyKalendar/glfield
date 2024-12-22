@@ -53,7 +53,7 @@ if(WIN32)
 	target_link_libraries(${PROJECT_NAME} mingw32 gcc_s_dw2-1 SDL2main SDL2 opengl32 glu32)
 elseif(WIN32_CROSS)
 	set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++") # не помогает
-	target_link_libraries(${PROJECT_NAME} opengl32 glu32 winpthread openal32 sfml-main sfml-system sfml-graphics sfml-window)
+	target_link_libraries(${PROJECT_NAME} opengl32 glu32 winpthread openal32 winmm sfml-main sfml-system sfml-graphics sfml-window)
 else()
 	target_link_libraries(${PROJECT_NAME} GL GLU sfml-window sfml-system sfml-graphics)
 endif()

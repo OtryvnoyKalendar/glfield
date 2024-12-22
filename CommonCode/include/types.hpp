@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef WIN32
+#ifndef __WIN32__
+
 struct COORD {
 	int x;
 	int y;
@@ -21,6 +24,9 @@ struct RECT {
 	long right;
 	long bottom;
 };
+
+#endif
+#endif
 
 struct Color {
 	float r, g, b;

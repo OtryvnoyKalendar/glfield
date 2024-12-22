@@ -1,3 +1,4 @@
+#define _USE_MATH_DEFINES // из за C++17
 #include <cmath>
 
 #include "map.h"

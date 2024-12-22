@@ -1,6 +1,5 @@
 #pragma once
 
-#ifndef WIN32
 #ifndef __WIN32__
 
 struct COORD {
@@ -25,7 +24,8 @@ struct RECT {
 	long bottom;
 };
 
-#endif
+#else
+#include "windows.h"
 #endif
 
 struct Color {

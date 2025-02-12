@@ -40,7 +40,7 @@ print_dashes() {
 }
 
 exec_is_exists() {
-	[ -f "$program_name" ]
+	[ -f "$program_name" ] || [ -f "$program_name.exe" ]
 }
 
 check_root_rights() {
@@ -116,7 +116,12 @@ check_and_compile() {
 run_program() {
 	print_message $NO_COLOR "Вот и начинается программа:"
 	print_dashes
-	./$program_name
+	if [ -f "$program_name.exe" ]
+	then
+		wine $program_name.exe
+	else
+		./$program_name
+	fi
 	return_value="$?"
 	print_return
 }
@@ -218,7 +223,7 @@ then
 		else
 			cmake ..
 		fi
-		cmake --build . # make
+		cmake --build . --parallel
 
 		if [ "$?" = "0" ]
 		then

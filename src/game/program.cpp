@@ -16,7 +16,7 @@ Objects objects;
 Map map;
 
 bool Program::GetRunning() {
-	return running;
+	return screen.window.isOpen();
 }
 
 void Program::Close() {
@@ -24,20 +24,18 @@ void Program::Close() {
 }
 
 void Program::CheckMainEvents() {
-	sf::Event event;
-
-	while(screen.window.pollEvent(event)) {
-		if(event.type == sf::Event::Closed) {
-			Close();
+	while(const std::optional event = screen.window.pollEvent()) {
+		if(event->is<sf::Event::Closed>()) {
+			screen.window.close();
 		}
-		else if(event.type == sf::Event::Resized) {
-			screen.width = event.size.width;
-			screen.height = event.size.height;
+		else if(const auto* resized = event->getIf<sf::Event::Resized>()) {
+			screen.width = resized->size.x;
+			screen.height = resized->size.y;
 			screen.SetPerspectiveAndLighting();
 		}
-		else if(event.type == sf::Event::KeyPressed) {
-			if (event.key.scancode == sf::Keyboard::Scan::Escape)
-				Close();
+		else if(const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
+			if(keyPressed->scancode == sf::Keyboard::Scancode::Escape)
+				screen.window.close();
 		}
 	}
 }
@@ -60,13 +58,13 @@ void PlayerMove() {
 	int moveForvard{0};
 	int moveRight{0};
 
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::W))
 		moveForvard = 1;
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::S))
 		moveForvard = -1;
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::A))
 		moveRight = -1;
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::D))
 		moveRight = 1;
 
 	if(jump > 0 && jump < 1) {
@@ -75,7 +73,7 @@ void PlayerMove() {
 			jump = 0;
 	}
 	else {
-		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::Space))
 			jump += jumpPlus;
 	}
 

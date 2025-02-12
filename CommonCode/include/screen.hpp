@@ -7,8 +7,8 @@ private:
 	void Init();
 public:
 	const char* name = "My OpenGL program";
-	int width = 600;
-	int height = 500;
+	unsigned int width = 600;
+	unsigned int height = 500;
 	float aspectRatio = 1.f;
 	sf::Window window;
 	

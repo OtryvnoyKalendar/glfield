@@ -1,14 +1,18 @@
 #include "screen.hpp"
 
 void Screen::Init() {
-	sf::ContextSettings settings;
-	settings.depthBits = 24;              // Биты глубины
-	settings.stencilBits = 8;             // Биты трафарета
-	settings.antialiasingLevel = 4;       // Уровень сглаживания
-	settings.majorVersion = 4;            // Основная версия OpenGL
-	settings.minorVersion = 6;            // Минорная версия OpenGL
-	
-	window.create(sf::VideoMode(width, height), name, sf::Style::Default, settings);
+	// sf::ContextSettings settings;
+	// settings.depthBits = 24;              // Биты глубины
+	// settings.stencilBits = 8;             // Биты трафарета
+	// settings.antiAliasingLevel = 4;       // Уровень сглаживания
+	// settings.majorVersion = 4;            // Основная версия OpenGL
+	// settings.minorVersion = 6;            // Минорная версия OpenGL
+	// window.create(sf::VideoMode({800, 600}), "OpenGL", sf::Style::Default, settings);
+
+	const auto nameTmp = static_cast<sf::String>(name);
+	const sf::Vector2u sizesTmp = {width, height};
+	window.create(sf::VideoMode(sizesTmp), nameTmp);
+
 	window.setVerticalSyncEnabled(true);
 	window.setActive(true);
 }

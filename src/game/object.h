@@ -2,16 +2,14 @@
 
 #include "glcore.hpp"
 
-enum ObjectType {
-	objFlowerRed, objFlowerYellow, objGrass, objTree,
-};
-
 class Object {
 public:
 	float x, y, z;
-	//ObjectType type; // не используется пока
 	GLuint tex;
 	float scale = 1;
+
+	bool IsPlayerNearby(float distance);
+	float IsPlayerFocusedOn(float objectRadius);
 };
 
 class Objects {
@@ -23,7 +21,6 @@ public:
 
 	void Init();
 	void FreeMemory();
-	Objects();
 	~Objects();
 };
 

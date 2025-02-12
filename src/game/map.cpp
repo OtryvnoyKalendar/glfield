@@ -84,6 +84,7 @@ void Map::DrawSelf() {
 	glDisable(GL_NORMAL_ARRAY);
 	glDisable(GL_TEXTURE_COORD_ARRAY);
 	glDisable(GL_VERTEX_ARRAY);
+	glDisable(GL_TEXTURE_2D);
 }
 
 void Map::CalcNormals(Cell a, Cell b, Cell c, Cell *n) {

@@ -11,8 +11,15 @@ public:
 	void Rotate(float xAngle, float zAngle);
 	void AutoTurnByMouse(float mouseSensitivity);
 	void MoveDirection(int moveForvard, int moveRight);
+	void MoveDirection(int moveForvard, int moveRight, float _speed);
+
+	float GetXRot();
+	float GetZRot();
+
+	float GetXRotRad();
+	float GetZRotRad();
 private:
-	float xRot, zRot;
+	float xRot, zRot; // Grad
 	bool cursorVisible;
 };
 

@@ -7,13 +7,19 @@
 
 #include "camera.h"
 #include "map.h"
-#include "texture.h"
 #include "object.h"
+#include "cubetree.h"
+#include "sky.h"
+#include "cursor.h"
+#include "sounds.h"
 
 Camera camera;
 Screen screen(900, 700, "Amazing field");
 Objects objects;
 Map map;
+Trees cubetrees;
+Sky sky;
+AudioManager audio;
 
 bool Program::GetRunning() {
 	return screen.window.isOpen();
@@ -40,9 +46,26 @@ void Program::CheckMainEvents() {
 	}
 }
 
+bool IsMouseCliced() {
+	static bool mousePressed = false;
+
+	if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+		if(!mousePressed) {
+			mousePressed = true;
+			return true;
+		}
+	}
+	else
+		mousePressed = false;
+
+	return false;
+}
+
 void Program::UpdateProgramLogic() {
 	RenderGraphics();
 	CheckMainEvents();
+	if(IsMouseCliced())
+		audio.PlaySound(sndPaper);
 }
 
 void PlayerMove() {
@@ -79,27 +102,42 @@ void PlayerMove() {
 
 	dy = std::sin(M_PI*jump)*jumpHeight;
 
-	camera.MoveDirection(moveForvard, moveRight);
+	float runSpeed{0};
+	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::LShift))
+		runSpeed = 0.25f;
+	else
+		runSpeed = 0.1f;
+
+	camera.MoveDirection(moveForvard, moveRight, runSpeed);
 	camera.Apply();
 	camera.z = map.GetHeight(camera.x, camera.y) + playerHeight + dy;
 }
 
-
 void DrawShapes() {
+	alpha += 0.02f;
+	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::U))
+		alpha += 1.2f;
+	if(alpha > 180)
+		alpha -= 360;
+
 	glPushMatrix();
+		sky.DrawStars();
+		sky.DrawSun(); // нужно перед camera.Apply();
 		PlayerMove();
-		GLfloat position[] = {1, 0, 2, 0};
-		glLightfv(GL_LIGHT0, GL_POSITION, position);
+		sky.ApplyLight();
+
 		map.DrawSelf();
 		objects.DrawSelf();
+		cubetrees.DrawSelf();
 	glPopMatrix();
 }
 
 void Program::RenderGraphics() {
-	glClearColor(0.6f, 0.8f, 1.0f, 0.0f);
+	sky.DrawBackground();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 	DrawShapes();
+	DrawCursor(0.7, 0.7, 0.7, 0.45, 0.03, 4);
 
 	screen.window.display();
 }
@@ -113,14 +151,22 @@ void Program::InitProgram() {
 	glEnable(GL_NORMALIZE);
 
 	glEnable(GL_ALPHA_TEST);
-	glAlphaFunc(GL_GREATER, 0.99);
+	glAlphaFunc(GL_GREATER, 0.4);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	InitTextures();
+	InitSounds();
+	audio.PlayMusic(mscRelax);
+
 	screen.SetPerspectiveAndLighting();
-	camera.Init(0, 0, 1.7, 0, 0, 0.1, false);
-	
+	camera.Init(10, 10, 1.7, 100, 270, 0.1, false);
+
 	map.Init();
 	objects.Init();
+	cubetrees.Init(60);
+	sky.Init();
 }
 
 Program::Program() {

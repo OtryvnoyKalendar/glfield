@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.15)
 
 set(PRINT_FOUND_SOURCES 0) # true / flase
 
-set(WIN_CROSS 1) # true / flase
+set(WIN_CROSS 0) # true / flase
 set(WIN_32BIT 0) # true / flase
 
 if(WIN_CROSS)
@@ -65,9 +65,10 @@ if(WIN_CROSS)
 		opengl32 winmm gdi32 glu32 winpthread freetype
 		
 		sfml-audio
-		OpenAL32 vorbis FLAC
+		OpenAL32 FLAC vorbisenc vorbisfile vorbis ogg
 
 		sfml-network
+		ws2_32
 	)
 elseif(WIN32)
 	add_compile_options(

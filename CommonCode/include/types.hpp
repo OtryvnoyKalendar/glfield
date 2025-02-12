@@ -1,7 +1,14 @@
 #pragma once
 
-#ifndef __WIN32__
+// нет в window.h
+struct RECTFLOAT {
+	float left;
+	float top;
+	float right;
+	float bottom;
+};
 
+#ifndef __WIN32__
 struct COORD {
 	int x;
 	int y;
@@ -23,9 +30,8 @@ struct RECT {
 	long right;
 	long bottom;
 };
-
 #else
-#include "windows.h"
+#include <windows.h>
 #endif
 
 struct Color {

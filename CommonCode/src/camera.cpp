@@ -1,4 +1,4 @@
-#define _USE_MATH_DEFINES // из за C++17
+#define _USE_MATH_DEFINES // C++17
 #include <cmath>
 
 #include "camera.h"
@@ -39,13 +39,31 @@ void Camera::AutoTurnByMouse(float mouseSensitivity) {
 	POINT cursor{};
 	cursor.x = sf::Mouse::getPosition(screen.window).x;
 	cursor.y = sf::Mouse::getPosition(screen.window).y;
-	static POINT base{screen.width/2, screen.height/2};
+	static POINT base {
+		static_cast<long>(screen.width)/2, static_cast<long>(screen.height)/2
+	};
 	Rotate((base.y-cursor.y) / mouseSensitivity, (base.x-cursor.x) / mouseSensitivity);
 	sf::Mouse::setPosition(sf::Vector2i(base.x, base.y), screen.window);
 }
 
 void Camera::ApplySettings() {
 	screen.window.setMouseCursorVisible(cursorVisible);
+}
+
+float Camera::GetXRot() {
+	return xRot;
+}
+
+float Camera::GetZRot() {
+	return zRot;
+}
+
+float Camera::GetXRotRad() {
+	return xRot * (M_PI / 180.f);
+}
+
+float Camera::GetZRotRad() {
+	return zRot * (M_PI / 180.f);
 }
 
 void Camera::MoveDirection(int moveForvard, int moveRight) {
@@ -70,5 +88,12 @@ void Camera::MoveDirection(int moveForvard, int moveRight) {
 	}
 
 	AutoTurnByMouse(6.0);
+}
+
+void Camera::MoveDirection(int moveForvard, int moveRight, float _speed) {
+	const float speedSave{speed};
+	speed = _speed;
+	MoveDirection(moveForvard, moveRight);
+	speed = speedSave;
 }
 

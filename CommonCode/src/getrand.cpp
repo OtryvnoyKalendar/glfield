@@ -4,7 +4,7 @@
 int GetRand(int min, int max) {
 	static bool initialized = false;
 	if(!initialized) {
-		srand(time(NULL));
+		srand(time(nullptr));
 		initialized = true;
 	}
 

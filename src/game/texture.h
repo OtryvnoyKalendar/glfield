@@ -13,4 +13,5 @@ extern GLuint texGrass;
 extern GLuint texMushroom;
 extern GLuint texTree;
 extern GLuint texTree2;
+extern GLuint texWood;
 

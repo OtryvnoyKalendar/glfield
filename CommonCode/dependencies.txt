@@ -1,0 +1,5 @@
+
+You must link this libraries on Linux to work this code correct:
+m (math lib) GL GLU
+sfml - all
+

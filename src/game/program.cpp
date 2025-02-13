@@ -145,6 +145,7 @@ void Program::RenderGraphics() {
 void Program::InitProgram() {
 	glEnable(GL_DEPTH_TEST);
 	glDepthMask(GL_TRUE);
+	glClearDepth(1.f);
 	glMatrixMode(GL_PROJECTION);
 
 	glEnable(GL_LIGHTING);

@@ -3,18 +3,21 @@
 #include "screen.hpp"
 
 void Screen::Init() {
-	// sf::ContextSettings settings;
-	// settings.depthBits = 24;              // Биты глубины
-	// settings.stencilBits = 8;             // Биты трафарета
-	// settings.antiAliasingLevel = 4;       // Уровень сглаживания
-	// settings.majorVersion = 4;            // Основная версия OpenGL
-	// settings.minorVersion = 6;            // Минорная версия OpenGL
-	// window(sf::VideoMode({800, 600}), "OpenGL", sf::Style::Default, settings);
+	const sf::ContextSettings settings {
+		.depthBits = 24,
+		.stencilBits = 8,
+		.antiAliasingLevel = 4,
+		.majorVersion = 4,
+		.minorVersion = 6,
+	};
 
 	const auto nameTmp = static_cast<sf::String>(name);
 	const sf::Vector2u sizesTmp = {width, height};
-	window.create(sf::VideoMode(sizesTmp), nameTmp);
-
+	sf::State stateTmp = sf::State::Windowed;
+	if(fullscreenInitialization)
+		stateTmp = sf::State::Fullscreen;
+	window.create(sf::VideoMode(sizesTmp), nameTmp, stateTmp, settings);
+	
 	window.setVerticalSyncEnabled(true);
 	if(!window.setActive(true))
 		std::cerr << "The window didn't focus" << std::endl;
@@ -45,7 +48,7 @@ Screen::Screen() {
 	Init();
 }
 
-Screen::Screen(int _width, int _height, const char* _name) : width(_width), height(_height) {
+Screen::Screen(int _width, int _height, const char* _name, bool isFullscreen) : width(_width), height(_height),  fullscreenInitialization(isFullscreen) {
 	name = _name;
 	Init();
 }

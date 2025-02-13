@@ -3,10 +3,7 @@
 #include "glcore.hpp"
 
 class Screen {
-private:
-	void Init();
 public:
-	const char* name = "My OpenGL program";
 	unsigned int width = 600;
 	unsigned int height = 500;
 	float aspectRatio = 1.f;
@@ -16,8 +13,13 @@ public:
 	void SetPerspective();
 	void SetPerspectiveAndLighting();
 	Screen();
-	Screen(int _width, int _height, const char* _name);
+	Screen(int _width, int _height, const char* _name, bool isFullscreen=false);
 	~Screen();
+private:
+	bool fullscreenInitialization{false};
+	const char* name = "My OpenGL program";
+	
+	void Init();
 };
 
 extern Screen screen;

@@ -32,10 +32,16 @@ else()
 	message(FATAL_ERROR "Неизвестная операционная система")
 endif()
 
-project(glfield)
+
+if(WIN_CROSS OR WIN32)
+	set(FILE_EXTENSION ".exe")
+else()
+	set(FILE_EXTENSION ".unix")
+endif()
+project("glfield${FILE_EXTENSION}")
 
 add_compile_options(
-	-Wall -Wextra -pedantic -std=c++17
+	-Wall -Wextra -pedantic -std=c++20 -O2
 )
 
 set(COMMON_CODE_DIR "./CommonCode")

@@ -7,7 +7,7 @@ source_find_format="cpp"
 header_find_format="hpp"
 find_directory="./src/"
 compiler="clang++"
-lib_names="-lm -lGL -lsfml-window -lsfml-system"
+lib_names="-lGL -lGLU -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -lsfml-network"
 warnings="-Wall -Wextra -Wpedantic"
 standard="-std=c++17"
 log_file="build.log"
@@ -116,11 +116,14 @@ check_and_compile() {
 run_program() {
 	print_message $NO_COLOR "Вот и начинается программа:"
 	print_dashes
-	if [ -f "$program_name.exe" ]
-	then
-		wine $program_name.exe
+	exe_file="$program_name.exe"
+	unix_file="$program_name.unix"
+	time1=$(stat -c %Y "$exe_file")                                                  
+	time2=$(stat -c %Y "$unix_file")                                                  
+	if [ -f "$exe_file" ] && [ "$time1" -gt "$time2" ]; then
+		wine "$exe_file"
 	else
-		./$program_name
+		./$unix_file
 	fi
 	return_value="$?"
 	print_return
@@ -209,38 +212,37 @@ print_dashes
 fi # run_mode != exit
 
 
-if [ "$run_mode" = "cmake" ]
-then
-	if [ -d "build" ]
-	then
-		print_dashes
-		print_message $BLUE "Запуск cmake"
-		print_dashes
-		cd build
-
-		if [ "$debug_mode" = "on" ]; then
-			cmake -DCMAKE_BUILD_TYPE=Debug ..
-		else
-			cmake ..
-		fi
-		cmake --build . --parallel
-
-		if [ "$?" = "0" ]
-		then
-			cd ../bin
-			if exec_is_exists
-			then
-				run_program
-				#rm $program_name
-			else
-				print_message $RED "Исполняемый файл не найден"
-			fi
-		else
-			print_message $RED "Ошибка компиляции или cmake сборки"
-		fi
-	else
+if [ "$run_mode" = "cmake" ]; then
+	if [ ! -d "build" ]; then
 		mkdir build
 		print_message $RED "Директория build не найдена, поэтому должна быть создана новая директория build"
+		sleep 1
+	fi
+
+	print_dashes
+	print_message $BLUE "Запуск cmake"
+	print_dashes
+	cd build
+
+	if [ "$debug_mode" = "on" ]; then
+		cmake -DCMAKE_BUILD_TYPE=Debug ..
+	else
+		cmake ..
+	fi
+	cmake --build . --parallel
+
+	if [ "$?" = "0" ]
+	then
+		cd ../bin
+		if exec_is_exists
+		then
+			run_program
+			#rm $program_name
+		else
+			print_message $RED "Исполняемый файл не найден"
+		fi
+	else
+		print_message $RED "Ошибка компиляции или cmake сборки"
 	fi
 fi
 

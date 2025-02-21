@@ -6,5 +6,7 @@ extern AudioManager audio;
 
 extern AudioId sndLaserShoot;
 extern AudioId sndPaper;
+extern AudioId sndGrass;
+
 extern AudioId mscRelax;
 

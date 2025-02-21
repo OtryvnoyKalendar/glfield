@@ -1,12 +1,9 @@
-#include "program.hpp"
+#include "program.h"
 
 int main() {
 	Program program;
 
-	while(program.GetRunning()) {
-		program.UpdateProgramLogic();
-	}
-
-	return 0;
+	while(program.IsRunning())
+		program.UpdateLogic();
 }
 

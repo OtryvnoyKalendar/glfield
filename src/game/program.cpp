@@ -1,10 +1,9 @@
-#define _USE_MATH_DEFINES // из за C++17
+#define _USE_MATH_DEFINES // C++17
 #include <cmath>
 
-#include "program.hpp"
+#include "program.h"
 #include "screen.hpp"
 #include "types.hpp"
-
 #include "camera.h"
 #include "map.h"
 #include "object.h"
@@ -12,6 +11,7 @@
 #include "sky.h"
 #include "cursor.h"
 #include "sounds.h"
+#include "select.h"
 
 Camera camera;
 Screen screen(900, 700, "Amazing field");
@@ -21,7 +21,7 @@ Trees cubetrees;
 Sky sky;
 AudioManager audio;
 
-bool Program::GetRunning() {
+bool Program::IsRunning() {
 	return screen.window.isOpen();
 }
 
@@ -61,11 +61,13 @@ bool IsMouseCliced() {
 	return false;
 }
 
-void Program::UpdateProgramLogic() {
+void Program::UpdateLogic() {
 	RenderGraphics();
 	CheckMainEvents();
-	if(IsMouseCliced())
-		audio.PlaySound(sndPaper);
+	if(IsMouseCliced()) {
+		audio.PlaySound(sndLaserShoot);
+		SelectShape();
+	}
 }
 
 void PlayerMove() {
@@ -96,8 +98,10 @@ void PlayerMove() {
 			jump = 0;
 	}
 	else {
-		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::Space))
+		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::Space)) {
 			jump += jumpPlus;
+			audio.PlaySound(sndGrass);
+		}
 	}
 
 	dy = std::sin(M_PI*jump)*jumpHeight;
@@ -121,8 +125,10 @@ void DrawShapes() {
 		alpha -= 360;
 
 	glPushMatrix();
-		sky.DrawStars();
-		sky.DrawSun(); // нужно перед camera.Apply();
+		if(!IsSelectMode()) {
+			sky.DrawStars();
+			sky.DrawSun(); // нужно перед camera.Apply();
+		}
 		PlayerMove();
 		sky.ApplyLight();
 
@@ -133,13 +139,22 @@ void DrawShapes() {
 }
 
 void Program::RenderGraphics() {
-	sky.DrawBackground();
+	if(IsSelectMode()) {
+		glClearColor(0, 0, 0, 0);
+		glDisable(GL_TEXTURE_2D);
+		glDisable(GL_LIGHTING);
+	}
+	else {
+		sky.DrawBackground();
+		glEnable(GL_LIGHTING);
+	}
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 	DrawShapes();
-	DrawCursor(0.7, 0.7, 0.7, 0.45, 0.03, 4);
-
-	screen.window.display();
+	if(!IsSelectMode()) {
+		DrawCursor(0.7, 0.7, 0.7, 0.45, 0.03, 4);
+		screen.window.display();
+	}
 }
 
 void Program::InitProgram() {

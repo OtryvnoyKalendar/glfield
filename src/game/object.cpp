@@ -6,6 +6,7 @@
 #include "map.h"
 #include "getrand.h"
 #include "camera.h"
+#include "select.h"
 
 GLfloat verticesFlower[] = {
 	-0.5,0,0, 0.5,0,0, 0.5,0,1, -0.5,0,1,
@@ -30,7 +31,8 @@ bool Object::IsPlayerNearby(float distance) {
 
 void Objects::DrawSelf() {
 	// текстуры и другие настройки уже должны быть включены
-	glEnable(GL_TEXTURE_2D);
+	if(!IsSelectMode())
+		glEnable(GL_TEXTURE_2D);
 	glEnable(GL_VERTEX_ARRAY);
 	glEnable(GL_TEXTURE_COORD_ARRAY);
 
@@ -39,11 +41,22 @@ void Objects::DrawSelf() {
 	
 	glNormal3f(0, 0, 1);
 
+	SetSelectedToZero();
+	int selectColor = 1;
+
 	for(int i = 0; i < plantsNum; i++) {
-		float selfColorTmp{0.7};
-		if(plants[i].IsPlayerNearby(5.f) && plants[i].IsPlayerFocusedOn())
-			selfColorTmp = 0.3;
-		glColor3f(selfColorTmp, selfColorTmp, selfColorTmp);
+		if(IsSelectMode() && plants[i].IsPlayerNearby(10.5f)
+			&& !(plants[i].tex == texTree || plants[i].tex == texTree2)) {
+			glColor3ub(selectColor, 0, 0);
+			AddToSelectedObjects({i, selectColor});
+			selectColor += 1;
+			if(selectColor >= 255)
+				break;
+		}
+		else {
+			float selfColorTmp{0.7};
+			glColor3f(selfColorTmp, selfColorTmp, selfColorTmp);
+		}
 
 		glBindTexture(GL_TEXTURE_2D, plants[i].tex);
 		glPushMatrix();

@@ -13,14 +13,14 @@ public:
 };
 
 class Objects {
-private:
-	Object* plants = nullptr;
-	int plantsNum = 0;
 public:
-	void DrawSelf();
+	Object* plants = nullptr;
 
+	void DrawSelf();
 	void Init();
 	void FreeMemory();
 	~Objects();
+private:
+	int plantsNum = 0;
 };
 

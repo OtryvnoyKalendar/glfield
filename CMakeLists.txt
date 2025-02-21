@@ -41,7 +41,7 @@ endif()
 project("glfield${FILE_EXTENSION}")
 
 add_compile_options(
-	-Wall -Wextra -pedantic -std=c++20 -O2
+	-Wall -Wextra -pedantic -std=c++17 -O2
 )
 
 set(COMMON_CODE_DIR "./CommonCode")

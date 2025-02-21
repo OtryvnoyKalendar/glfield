@@ -29,7 +29,9 @@ float Map::GetHeight(float x, float y) {
 	return (1-(y-iy))*h1 + (y-iy)*h2;
 }
 
-void Map::Init() {
+void Map::Init(int _hillsNum) {
+	hillsNum = _hillsNum;
+
 	for(int i = 0; i < width; i++)
 		for(int j = 0; j < height; j++) {
 			arrayCells[i][j].x = i;
@@ -54,7 +56,7 @@ void Map::Init() {
 		}
 	}
 
-	for(int i = 0; i < 10; i++)
+	for(int i = 0; i < hillsNum; i++)
 		CreateHill(GetRand(0,width), GetRand(0,height), GetRand(0, 50), GetRand(0, 10));
 
 	for(int i = 0; i < width-1; i++)

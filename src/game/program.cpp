@@ -166,7 +166,7 @@ void Program::InitProgram() {
 	screen.SetPerspectiveAndLighting();
 	camera.Init(10, 10, 1.7, 100, 270, 0.1, false);
 
-	map.Init();
+	map.Init(10);
 	objects.Init();
 	cubetrees.Init(60);
 	sky.Init();

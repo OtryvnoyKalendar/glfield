@@ -9,7 +9,7 @@ public:
 	float scale = 1;
 
 	bool IsPlayerNearby(float distance);
-	float IsPlayerFocusedOn(float objectRadius);
+	bool IsPlayerFocusedOn();
 };
 
 class Objects {

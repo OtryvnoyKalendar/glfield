@@ -3,13 +3,12 @@
 #include "screen.hpp"
 
 void Screen::Init() {
-	const sf::ContextSettings settings {
-		.depthBits = 24,
-		.stencilBits = 8,
-		.antiAliasingLevel = 4,
-		.majorVersion = 4,
-		.minorVersion = 6,
-	};
+	sf::ContextSettings settings;
+	settings.depthBits = 24;
+	settings.stencilBits = 8;
+	settings.antiAliasingLevel = 4;
+	settings.majorVersion = 4;
+	settings.minorVersion = 6;
 
 	const auto nameTmp = static_cast<sf::String>(name);
 	const sf::Vector2u sizesTmp = {width, height};
@@ -17,6 +16,8 @@ void Screen::Init() {
 	if(fullscreenInitialization)
 		stateTmp = sf::State::Fullscreen;
 	window.create(sf::VideoMode(sizesTmp), nameTmp, stateTmp, settings);
+	screen.width = window.getSize().x;
+	screen.height = window.getSize().y;
 	
 	window.setVerticalSyncEnabled(true);
 	if(!window.setActive(true))

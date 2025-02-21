@@ -39,7 +39,7 @@ void Camera::AutoTurnByMouse(float mouseSensitivity) {
 	POINT cursor{};
 	cursor.x = sf::Mouse::getPosition(screen.window).x;
 	cursor.y = sf::Mouse::getPosition(screen.window).y;
-	static POINT base {
+	const POINT base {
 		static_cast<int>(screen.width)/2, static_cast<int>(screen.height)/2
 	};
 	Rotate((base.y-cursor.y) / mouseSensitivity, (base.x-cursor.x) / mouseSensitivity);

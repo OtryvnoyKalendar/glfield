@@ -10,12 +10,13 @@ public:
 	static const int width = 100;
 	static const int height = 100;
 
-	void Init();
+	void Init(int _hillsNum=12);
 	void DrawSelf();
 	bool IsCoordExist(float x, float y);
 	float GetHeight(float x, float y);
 	Map();
 private:
+	int hillsNum;
 	static const int indexesNum = (width-1)*(height-1)*6;
 
 	Cell arrayNormals[width][height];

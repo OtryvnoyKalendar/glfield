@@ -1,5 +1,5 @@
 #!/bin/bash
-script_version="1.11" # версия скрипта
+script_version="1.12" # версия скрипта
 
 #настраиваемые параметры
 program_name="glfield"

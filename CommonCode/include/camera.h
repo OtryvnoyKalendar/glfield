@@ -15,7 +15,6 @@ public:
 
 	float GetXRot();
 	float GetZRot();
-
 	float GetXRotRad();
 	float GetZRotRad();
 private:

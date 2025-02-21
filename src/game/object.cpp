@@ -29,6 +29,12 @@ bool Object::IsPlayerNearby(float distance) {
 	return std::sqrt(std::pow(x - camera.x, 2) + std::pow(y - camera.y, 2) + std::pow(z - camera.z, 2)) <= distance;
 }
 
+void Object::SetRandomPosition() {
+	x = GetRand(1, map.width-1);
+	y = GetRand(1, map.height-1);
+	z = map.GetHeight(x, y) - 0.1;
+}
+
 void Objects::DrawSelf() {
 	// текстуры и другие настройки уже должны быть включены
 	if(!IsSelectMode())
@@ -112,9 +118,7 @@ void Objects::Init() {
 
 		plants[i].tex = newTexture;
 		plants[i].scale = newScale;
-		plants[i].x = GetRand(1, map.width-1);
-		plants[i].y = GetRand(1, map.height-1);
-		plants[i].z = map.GetHeight(plants[i].x, plants[i].y) - 0.1;
+		plants[i].SetRandomPosition();
 	}
 }
 

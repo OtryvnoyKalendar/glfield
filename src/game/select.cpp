@@ -4,6 +4,7 @@
 #include "screen.hpp"
 #include "select.h"
 #include "object.h"
+#include "animation.h"
 
 extern Objects objects;
 
@@ -39,7 +40,8 @@ void Program::SelectShape() {
 	if(color[0] > 0) {
 		for(int i = 0; i < selectedObjectsNum; i++)
 			if(selectArray[i].colorIndex == color[0]) {
-				objects.plants[selectArray[i].plantIndexInArray].z = -1000;
+				animPickingUp.SetObject(&objects.plants[selectArray[i].plantIndexInArray]);
+				// objects.plants[selectArray[i].plantIndexInArray].z = -1000;
 			}
 	}
 }

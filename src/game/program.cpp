@@ -12,6 +12,7 @@
 #include "cursor.h"
 #include "sounds.h"
 #include "select.h"
+#include "animation.h"
 
 Camera camera;
 Screen screen(900, 700, "Amazing field");
@@ -62,6 +63,7 @@ bool IsMouseCliced() {
 }
 
 void Program::UpdateLogic() {
+	animPickingUp.Play();
 	RenderGraphics();
 	CheckMainEvents();
 	if(IsMouseCliced()) {

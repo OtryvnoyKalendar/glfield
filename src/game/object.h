@@ -8,6 +8,7 @@ public:
 	GLuint tex;
 	float scale = 1;
 
+	void SetRandomPosition();
 	bool IsPlayerNearby(float distance);
 	bool IsPlayerFocusedOn();
 };

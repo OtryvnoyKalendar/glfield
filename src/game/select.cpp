@@ -11,9 +11,9 @@ extern Objects objects;
 const int selectMaxNum{255};
 static bool isSelectMode{false};
 static int selectedObjectsNum{};
-static std::array<SelectObject, selectMaxNum> selectArray{};
+static std::array<Selectobj, selectMaxNum> selectArray{};
 
-void AddToSelectedObjects(SelectObject object) {
+void AddToSelectedObjects(Selectobj object) {
 	selectArray[selectedObjectsNum] = object;
 	selectedObjectsNum += 1;
 }

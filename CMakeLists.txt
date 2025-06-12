@@ -1,33 +1,43 @@
 cmake_minimum_required(VERSION 3.15)
 
-set(PRINT_FOUND_SOURCES 0) # true / flase
+set(PRINT_FOUND_SOURCES false)
 
-set(WIN_CROSS 0) # true / flase
-set(WIN_32BIT 0) # true / flase
+set(WIN_CROSS false)
+set(WIN_32BIT false)
+
+function(set_compilers c_compiler cxx_compiler)
+    set(CMAKE_C_COMPILER "${c_compiler}" CACHE STRING "C compiler" FORCE)
+    set(CMAKE_CXX_COMPILER "${cxx_compiler}" CACHE STRING "C++ compiler" FORCE)
+endfunction()
+
+function(set_bin_dir directory)
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/../bin/${directory}" CACHE STRING "Binary directory" FORCE)
+	file(WRITE "cached_bin_dir.txt" "${directory}\n")
+endfunction()
 
 if(WIN_CROSS)
 	message("Сборка на Linux под Windows")
 	if(WIN_32BIT)
 		message("Нужно поменять dll файлы на те, что лежат в win32, если раньше вы использовали 64-битную сборку")
-		set(CMAKE_C_COMPILER i686-w64-mingw32-gcc)
-		set(CMAKE_CXX_COMPILER i686-w64-mingw32-g++)
+		set_compilers(i686-w64-mingw32-gcc i686-w64-mingw32-g++)
+		set_bin_dir(windows-32bit)
 	else()
-		set(CMAKE_C_COMPILER x86_64-w64-mingw32-gcc)
-		set(CMAKE_CXX_COMPILER x86_64-w64-mingw32-g++)
+		set_compilers(x86_64-w64-mingw32-gcc x86_64-w64-mingw32-g++)
+		set_bin_dir(windows-64bit)
 	endif()
 elseif(WIN32)
 	message("Сборка на Windows")
 	message("Cборка с mingw32-g++ не проверялась и может не работать")
-	set(CMAKE_C_COMPILER mingw32-gcc)
-	set(CMAKE_CXX_COMPILER mingw32-g++)
+	set_compilers(mingw32-gcc mingw32-g++)
+	set_bin_dir(windows-64bit)
 elseif(APPLE)
 	message("Сборка на macOS")
-	set(CMAKE_C_COMPILER clang)
-	set(CMAKE_CXX_COMPILER clang++)
+	set_compilers(clang clang++)
+	set_bin_dir(macos-64bit)
 elseif(UNIX)
 	message("Сборка на Linux")
-	set(CMAKE_C_COMPILER gcc)
-	set(CMAKE_CXX_COMPILER g++)
+	set_compilers(gcc g++)
+	set_bin_dir(linux-64bit)
 else()
 	message(FATAL_ERROR "Неизвестная операционная система")
 endif()
@@ -44,13 +54,18 @@ add_compile_options(
 	-Wall -Wextra -pedantic -std=c++17 -O2
 )
 
+if(WIN_CROSS)
+	add_compile_definitions(
+		SFML_STATIC
+		UNICODE _UNICODE
+	)
+endif()
+
 set(COMMON_CODE_DIR "./CommonCode")
 
 include_directories(src/game)
 include_directories(src/)
 include_directories("${COMMON_CODE_DIR}/include")
-
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin)
 
 file(GLOB COMMON_SOURCES "${COMMON_CODE_DIR}/src/*.cpp")
 file(GLOB SOURCES "${PROJECT_SOURCE_DIR}/src/**/*.cpp")
@@ -62,7 +77,6 @@ endif()
 
 if(WIN_CROSS)
 	add_compile_options(
-		-DSFML_STATIC
 		-static
 		-static-libgcc -static-libstdc++
 	)

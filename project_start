@@ -40,7 +40,7 @@ print_dashes() {
 }
 
 exec_is_exists() {
-	[ -f "$program_name" ] || [ -f "$program_name.exe" ]
+	[ -f "$program_name.unix" ] || [ -f "$program_name.exe" ]
 }
 
 check_root_rights() {
@@ -118,9 +118,7 @@ run_program() {
 	print_dashes
 	exe_file="$program_name.exe"
 	unix_file="$program_name.unix"
-	time1=$(stat -c %Y "$exe_file")                                                  
-	time2=$(stat -c %Y "$unix_file")                                                  
-	if [ -f "$exe_file" ] && [ "$time1" -gt "$time2" ]; then
+	if [ -f "$exe_file" ]; then
 		wine "$exe_file"
 	else
 		./$unix_file
@@ -233,7 +231,10 @@ if [ "$run_mode" = "cmake" ]; then
 
 	if [ "$?" = "0" ]
 	then
-		cd ../bin
+		cd ..
+		platform_dir="unknow"
+		read -r platform_dir < cached_bin_dir.txt 
+		cd "bin/$platform_dir"
 		if exec_is_exists
 		then
 			run_program

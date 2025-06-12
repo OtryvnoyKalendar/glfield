@@ -7,8 +7,8 @@ void Screen::Init() {
 	settings.depthBits = 24;
 	settings.stencilBits = 8;
 	settings.antiAliasingLevel = 4;
-	settings.majorVersion = 4;
-	settings.minorVersion = 6;
+	settings.majorVersion = 3;
+	settings.minorVersion = 0;
 
 	const auto nameTmp = static_cast<sf::String>(name);
 	const sf::Vector2u sizesTmp = {width, height};

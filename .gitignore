@@ -3,6 +3,7 @@
 
 build/
 build.log
+cached_bin_dir.txt
 
 # Object files
 *.o

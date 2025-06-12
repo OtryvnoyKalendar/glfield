@@ -44,7 +44,7 @@ void LoadConfigInfo() {
 		exit(1);
 	}
 	else {
-		const char* openMessage = "load resource directory: ";
+		const char* openMessage = "\nLoad resource directory: ";
 		
 		std::string line;
 		getline(file, line); resourcePath += line;

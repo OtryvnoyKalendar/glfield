@@ -6,7 +6,7 @@
 
 #include "glcore.hpp"
 
-using AudioId = long unsigned int;
+using AudioId = unsigned long int;
 
 class SoundInMemory {
 public:

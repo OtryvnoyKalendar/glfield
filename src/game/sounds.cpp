@@ -1,4 +1,4 @@
-#include "sound.h"
+#include "sounds.h"
 #include "gameconf.h"
 
 AudioId sndLaserShoot;

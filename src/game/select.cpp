@@ -41,7 +41,6 @@ void Program::SelectShape() {
 		for(int i = 0; i < selectedObjectsNum; i++)
 			if(selectArray[i].colorIndex == color[0]) {
 				animPickingUp.SetObject(&objects.plants[selectArray[i].plantIndexInArray]);
-				// objects.plants[selectArray[i].plantIndexInArray].z = -1000;
 			}
 	}
 }

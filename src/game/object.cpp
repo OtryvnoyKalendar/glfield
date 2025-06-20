@@ -8,18 +8,20 @@
 #include "camera.h"
 #include "select.h"
 
-GLfloat verticesFlower[] = {
-	-0.5,0,0, 0.5,0,0, 0.5,0,1, -0.5,0,1,
-	0,-0.5,0, 0,0.5,0, 0,0.5,1, 0,-0.5,1,
-};
+namespace {
+	GLfloat verticesFlower[] = {
+		-0.5,0,0, 0.5,0,0, 0.5,0,1, -0.5,0,1,
+		0,-0.5,0, 0,0.5,0, 0,0.5,1, 0,-0.5,1,
+	};
 
-GLfloat UVFlower[] = {
-	0,1, 1,1, 1,0, 0,0, 0,1, 1,1, 1,0, 0,0,
-};
+	GLfloat UVFlower[] = {
+		0,1, 1,1, 1,0, 0,0, 0,1, 1,1, 1,0, 0,0,
+	};
 
-GLuint indexesFlower[] = {
-	0,1,2, 2,3,0, 4,5,6, 6,7,4,
-};
+	GLuint indexesFlower[] = {
+		0,1,2, 2,3,0, 4,5,6, 6,7,4,
+	};
+}
 
 bool Object::IsPlayerFocusedOn() {
 	return true;
@@ -83,11 +85,7 @@ void Objects::Init() {
 	int treeNum = 0;
 
 	plantsNum = grassNum + mushroomNum + treeNum;
-	plants = new Object[plantsNum];
-	if(plants == nullptr) {
-		printf("memory allocation error\n");
-		exit(1);
-	}
+	plants = std::make_unique<Object[]>(plantsNum);
 
 	for(int i = 0; i < plantsNum; i++) {
 		GLuint newTexture = texGrass;
@@ -120,16 +118,5 @@ void Objects::Init() {
 		plants[i].scale = newScale;
 		plants[i].SetRandomPosition();
 	}
-}
-
-void Objects::FreeMemory() {
-	if(plants != nullptr) {
-		delete [] plants;
-		plants = nullptr;
-	}
-}
-
-Objects::~Objects() {
-	FreeMemory();
 }
 

@@ -9,18 +9,18 @@
 #include "object.h"
 #include "cubetree.h"
 #include "sky.h"
-#include "cursor.h"
 #include "sounds.h"
 #include "select.h"
 #include "animation.h"
+#include "hud.h"
 
-Camera camera;
 Screen screen(900, 700, "Amazing field");
+Camera camera;
+AudioManager audio;
+
+static Trees cubetrees;
 Objects objects;
 Map map;
-Trees cubetrees;
-Sky sky;
-AudioManager audio;
 
 bool Program::IsRunning() {
 	return screen.window.isOpen();
@@ -119,20 +119,24 @@ void PlayerMove() {
 	camera.z = map.GetHeight(camera.x, camera.y) + playerHeight + dy;
 }
 
-void DrawShapes() {
+void ChangeSunAngle() {
 	alpha += 0.02f;
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::U))
 		alpha += 1.2f;
 	if(alpha > 180)
 		alpha -= 360;
+}
+
+void DrawShapes() {
+	ChangeSunAngle();
 
 	glPushMatrix();
 		if(!IsSelectMode()) {
-			sky.DrawStars();
-			sky.DrawSun(); // нужно перед camera.Apply();
+			Sky().DrawStars();
+			Sky().DrawSun(); // нужно перед camera.Apply();
 		}
 		PlayerMove();
-		sky.ApplyLight();
+		Sky().ApplyLight();
 
 		map.DrawSelf();
 		objects.DrawSelf();
@@ -147,19 +151,19 @@ void Program::RenderGraphics() {
 		glDisable(GL_LIGHTING);
 	}
 	else {
-		sky.DrawBackground();
+		Sky().DrawBackground();
 		glEnable(GL_LIGHTING);
 	}
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 	DrawShapes();
 	if(!IsSelectMode()) {
-		DrawCursor(0.7, 0.7, 0.7, 0.45, 0.03, 4);
+		Hud().DrawSelf();
 		screen.window.display();
 	}
 }
 
-void Program::InitProgram() {
+void InitRenderingState() {
 	glEnable(GL_DEPTH_TEST);
 	glDepthMask(GL_TRUE);
 	glClearDepth(1.f);
@@ -175,6 +179,10 @@ void Program::InitProgram() {
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+}
+
+void Program::InitProgram() {
+	InitRenderingState();
 
 	InitTextures();
 	InitSounds();
@@ -186,14 +194,13 @@ void Program::InitProgram() {
 	map.Init(10);
 	objects.Init();
 	cubetrees.Init(60);
-	sky.Init();
+	Sky::GetInstance().Init();
+	Hud::GetInstance();
 }
 
 Program::Program() {
 	InitProgram();
 }
 
-Program::~Program() {
-
-}
+Program::~Program() {}
 

@@ -4,8 +4,9 @@
 #include "types.hpp"
 #include "glcore.hpp"
 #include "texture.h"
+#include "singleton.h"
 
-class Map {
+class Map : public LazySingleton<Map> {
 public:
 	static const int width = 100;
 	static const int height = 100;

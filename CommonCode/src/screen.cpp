@@ -49,12 +49,9 @@ Screen::Screen() {
 	Init();
 }
 
-Screen::Screen(int _width, int _height, const char* _name, bool isFullscreen) : width(_width), height(_height),  fullscreenInitialization(isFullscreen) {
+Screen::Screen(int _width, int _height, const char* _name, bool isFullscreen)
+	: width(_width), height(_height),  fullscreenInitialization(isFullscreen) {
 	name = _name;
 	Init();
-}
-
-Screen::~Screen() {
-
 }
 

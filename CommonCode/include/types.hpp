@@ -34,7 +34,11 @@ struct RECT {
 #include <windows.h>
 #endif
 
-struct Color {
+struct RgbColor {
 	float r, g, b;
+};
+
+struct RgbaColor {
+	float r, g, b, a;
 };
 

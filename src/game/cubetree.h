@@ -1,10 +1,15 @@
 #pragma once
+
+#include <memory>
+
 #include "object.h"
 #include "texture.h"
+#include "singleton.h"
 
 class Tree {
 public:
-	Object* cubes = nullptr;
+	std::unique_ptr<Object[]> cubes{nullptr};
+
 	void Init(float _x, float _y);
 	void DrawSelf();
 private:
@@ -14,13 +19,12 @@ private:
 	GLuint tex = texWood;
 };
 
-class Trees {
+class Trees : public LazySingleton<Trees> {
 public:
-	~Trees();
 	void Init(int _treesNum = 50);
 	void DrawSelf();
 private:
-	Tree* trees = nullptr;
+	std::unique_ptr<Tree[]> trees{nullptr};
 	int treesNum = 50;
 };
 

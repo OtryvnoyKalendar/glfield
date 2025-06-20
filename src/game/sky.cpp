@@ -2,12 +2,15 @@
 #include "getrand.h"
 #include "camera.h"
 
+namespace {
+	float sunsetValue{0};
+	float skyBright{0};
+	GLfloat verticesSun[] = {
+		-1,-1,0, 1,-1,0, 1,1,0, -1,1,0,
+	};
+}
 float alpha{0};
-float sunsetValue{0};
-float skyBright{0};
-GLfloat verticesSun[] = {
-	-1,-1,0, 1,-1,0, 1,1,0, -1,1,0,
-};
+GLfloat Sky::verticesStars[Sky::verticesStarsNum]{};
 
 void RotateToCamera() {
 	glRotatef(-camera.GetXRot(), 1, 0, 0);
@@ -48,12 +51,9 @@ void Sky::ApplyLight() {
 }
 
 void Sky::Init() {
-	for(int i = 0; i < starsNum; i++) {
+	for(int i = 0; i < starsNum; i++)
 		for(int j = 0; j < 3; j++)
 			verticesStars[i*3 + j] = GetRand(0,1) == 0 ? GetRand(3, 10) : GetRand(-10, -3);
-
-		starsColorRatio[i] = 0.5f + GetRand(1, 5) * 0.1f;
-	}
 }
 
 void Sky::DrawBackground() {
@@ -74,7 +74,7 @@ void Sky::DrawStars() {
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glPointSize(5);
 		const float starColor{0.7};
-		glColor4f(starColor,starColor,starColor, 1-skyBright*1.3);
+		glColor4f(starColor, starColor, starColor, 1-skyBright*1.3);
 
 		RotateToCamera();
 		glVertexPointer(3, GL_FLOAT, 0, verticesStars);

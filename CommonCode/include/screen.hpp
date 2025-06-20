@@ -14,7 +14,7 @@ public:
 	void SetPerspectiveAndLighting();
 	Screen();
 	Screen(int _width, int _height, const char* _name, bool isFullscreen=false);
-	~Screen();
+	~Screen() = default;
 private:
 	bool fullscreenInitialization{false};
 	const char* name = "My OpenGL program";

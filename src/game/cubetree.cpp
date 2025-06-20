@@ -2,32 +2,34 @@
 #include "map.h"
 #include "getrand.h"
 
-GLfloat verticesCube[] = {
-	0,0,0, 1,0,0, 1,1,0, 0,1,0,
-	0,0,1, 1,0,1, 1,1,1, 0,1,1,
-	// тоже самое для других текстурных координат
-	0,0,0, 1,0,0, 1,1,0, 0,1,0,
-	0,0,1, 1,0,1, 1,1,1, 0,1,1,
-};
+namespace {
+	GLfloat verticesCube[] = {
+		0,0,0, 1,0,0, 1,1,0, 0,1,0,
+		0,0,1, 1,0,1, 1,1,1, 0,1,1,
+		// тоже самое для других текстурных координат
+		0,0,0, 1,0,0, 1,1,0, 0,1,0,
+		0,0,1, 1,0,1, 1,1,1, 0,1,1,
+	};
 
-GLfloat UVTreeLog[] = {
-	0.5,0.5, 1,0.5, 1,0, 0.5,0,
-	0.5,0.5, 1,0.5, 1,0, 0.5,0,
-	0,0.5, 0.5,0.5, 0,0.5, 0.5,0.5,
-	0,0, 0.5,0, 0,0, 0.5,0,
-};
+	GLfloat UVTreeLog[] = {
+		0.5,0.5, 1,0.5, 1,0, 0.5,0,
+		0.5,0.5, 1,0.5, 1,0, 0.5,0,
+		0,0.5, 0.5,0.5, 0,0.5, 0.5,0.5,
+		0,0, 0.5,0, 0,0, 0.5,0,
+	};
 
-GLfloat UVTreeLeaf[] = {
-	0,1, 0.5,1, 0.5,0.5, 0,0.5,
-	0,1, 0.5,1, 0.5,0.5, 0,0.5,
-	0,0.5, 0.5,0.5, 0,0.5, 0.5,0.5,
-	0,1, 0.5,1, 0,1, 0.5,1,
-};
+	GLfloat UVTreeLeaf[] = {
+		0,1, 0.5,1, 0.5,0.5, 0,0.5,
+		0,1, 0.5,1, 0.5,0.5, 0,0.5,
+		0,0.5, 0.5,0.5, 0,0.5, 0.5,0.5,
+		0,1, 0.5,1, 0,1, 0.5,1,
+	};
 
-GLuint indexesCube[] = {
-	0,1,2, 2,3,0, 4,5,6, 6,7,4, 8,9,13, 13,12,8,
-	9,10,14, 14,13,9, 10,11,15, 15,14,10, 11,8,12, 12,15,11,
-};
+	GLuint indexesCube[] = {
+		0,1,2, 2,3,0, 4,5,6, 6,7,4, 8,9,13, 13,12,8,
+		9,10,14, 14,13,9, 10,11,15, 15,14,10, 11,8,12, 12,15,11,
+	};
+}
 
 void Tree::DrawSelf() {
 	glEnable(GL_TEXTURE_2D);
@@ -58,7 +60,7 @@ void Tree::DrawSelf() {
 
 void Tree::Init(float x, float y) {
 	float z = map.GetHeight(x+0.5, y+0.5) - 0.5;
-	cubes = new Object[cubesNum];
+	cubes = std::make_unique<Object[]>(cubesNum);
 
 	for(int i = 0; i < logsNum; i++) {
 		cubes[i].x = x;
@@ -89,7 +91,7 @@ void Tree::Init(float x, float y) {
 
 void Trees::Init(int _treesNum) {
 	treesNum = _treesNum;
-	trees = new Tree [treesNum];
+	trees = std::make_unique<Tree[]>(treesNum);
 	for(int i = 0; i < treesNum; i++)
 		trees[i].Init(GetRand(2, map.width-2), GetRand(2, map.height-2));
 }
@@ -97,14 +99,5 @@ void Trees::Init(int _treesNum) {
 void Trees::DrawSelf() {
 	for(int i = 0; i < treesNum; i++)
 		trees[i].DrawSelf();
-}
-
-Trees::~Trees() {
-	if(trees != nullptr) {
-		for(int i = 0; i < treesNum; i++)
-			delete [] trees[i].cubes;
-		delete [] trees;
-		trees= nullptr;
-	}
 }
 

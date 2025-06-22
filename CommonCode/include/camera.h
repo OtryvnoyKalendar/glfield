@@ -13,6 +13,9 @@ public:
 	void MoveDirection(int moveForvard, int moveRight);
 	void MoveDirection(int moveForvard, int moveRight, float _speed);
 
+	bool GetCursorVisible();
+	void SetCursorVisible(bool visible);
+
 	float GetXRot();
 	float GetZRot();
 	float GetXRotRad();

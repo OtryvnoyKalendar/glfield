@@ -13,6 +13,8 @@
 #include "select.h"
 #include "animation.h"
 #include "hud.h"
+#include "player.h"
+#include "onepress.h"
 
 Screen screen(900, 700, "Amazing field");
 Camera camera;
@@ -21,6 +23,7 @@ AudioManager audio;
 static Trees cubetrees;
 Objects objects;
 Map map;
+Player player;
 
 bool Program::IsRunning() {
 	return screen.window.isOpen();
@@ -47,76 +50,15 @@ void Program::CheckMainEvents() {
 	}
 }
 
-bool IsMouseCliced() {
-	static bool mousePressed = false;
-
-	if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-		if(!mousePressed) {
-			mousePressed = true;
-			return true;
-		}
-	}
-	else
-		mousePressed = false;
-
-	return false;
-}
-
 void Program::UpdateLogic() {
 	animPickingUp.Play();
 	RenderGraphics();
 	CheckMainEvents();
-	if(IsMouseCliced()) {
+	if(!camera.GetCursorVisible() && IsMouseClicked::Left()) {
 		audio.PlaySound(sndLaserShoot);
 		SelectShape();
 	}
-}
-
-void PlayerMove() {
-	if(!screen.window.hasFocus())
-		return;
-
-	const float jumpHeight{4.0};
-	static float jump{0};
-	const float jumpPlus{0.04};
-	float dy{0};
-	
-	float playerHeight{1.7f};
-	int moveForvard{0};
-	int moveRight{0};
-
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::W))
-		moveForvard = 1;
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::S))
-		moveForvard = -1;
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::A))
-		moveRight = -1;
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::D))
-		moveRight = 1;
-
-	if(jump > 0 && jump < 1) {
-		jump += jumpPlus;
-		if(jump > 1)
-			jump = 0;
-	}
-	else {
-		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::Space)) {
-			jump += jumpPlus;
-			audio.PlaySound(sndGrass);
-		}
-	}
-
-	dy = std::sin(M_PI*jump)*jumpHeight;
-
-	float runSpeed{0};
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::LShift))
-		runSpeed = 0.25f;
-	else
-		runSpeed = 0.1f;
-
-	camera.MoveDirection(moveForvard, moveRight, runSpeed);
-	camera.Apply();
-	camera.z = map.GetHeight(camera.x, camera.y) + playerHeight + dy;
+	player.ProcessInput();
 }
 
 void ChangeSunAngle() {
@@ -133,9 +75,9 @@ void DrawShapes() {
 	glPushMatrix();
 		if(!IsSelectMode()) {
 			Sky().DrawStars();
-			Sky().DrawSun(); // нужно перед camera.Apply();
+			Sky().DrawSun();
 		}
-		PlayerMove();
+		player.Move();
 		Sky().ApplyLight();
 
 		map.DrawSelf();
@@ -196,11 +138,11 @@ void Program::InitProgram() {
 	cubetrees.Init(60);
 	Sky::GetInstance().Init();
 	Hud::GetInstance();
+
+	player.Init(10, HealthStatus({15, 20}));
 }
 
 Program::Program() {
 	InitProgram();
 }
-
-Program::~Program() {}
 

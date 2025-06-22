@@ -1,27 +1,12 @@
 #pragma once
 
-// нет в window.h
-struct RECTFLOAT {
-	float left;
-	float top;
-	float right;
-	float bottom;
-};
-
 #ifndef __WIN32__
-struct COORD {
-	int x;
-	int y;
-};
-
-struct POINT {
-	int x;
-	int y;
-};
+typedef struct {
+	int x, y;
+} COORD, POINT;
 
 struct POINTFLOAT {
-	float x;
-	float y;
+	float x, y;
 };
 
 struct RECT {
@@ -33,6 +18,19 @@ struct RECT {
 #else
 #include <windows.h>
 #endif
+
+
+// this is not present in windows.h
+struct RECTFLOAT {
+	float left;
+	float top;
+	float right;
+	float bottom;
+};
+
+struct Vec3f {
+	float x, y, z;
+};
 
 struct RgbColor {
 	float r, g, b;

@@ -6,7 +6,7 @@ namespace {
 	GLfloat verticesCube[] = {
 		0,0,0, 1,0,0, 1,1,0, 0,1,0,
 		0,0,1, 1,0,1, 1,1,1, 0,1,1,
-		// тоже самое для других текстурных координат
+		// повторяется для других текстурных координат
 		0,0,0, 1,0,0, 1,1,0, 0,1,0,
 		0,0,1, 1,0,1, 1,1,1, 0,1,1,
 	};
@@ -48,7 +48,8 @@ void Tree::DrawSelf() {
 			glTexCoordPointer(2, GL_FLOAT, 0, UVTreeLeaf);
 
 		glPushMatrix();
-			glTranslatef(cubes[i].x, cubes[i].y, cubes[i].z);
+			Vec3f& p = cubes[i].pos;
+			glTranslatef(p.x, p.y, p.z);
 			glDrawElements(GL_TRIANGLES, std::size(indexesCube), GL_UNSIGNED_INT, indexesCube);
 		glPopMatrix();
 	}
@@ -63,9 +64,9 @@ void Tree::Init(float x, float y) {
 	cubes = std::make_unique<Object[]>(cubesNum);
 
 	for(int i = 0; i < logsNum; i++) {
-		cubes[i].x = x;
-		cubes[i].y = y;
-		cubes[i].z = z+i;
+		cubes[i].pos.x = x;
+		cubes[i].pos.y = y;
+		cubes[i].pos.z = z+i;
 	}
 
 	int pos = logsNum;
@@ -73,24 +74,24 @@ void Tree::Init(float x, float y) {
 		for(int i = x-2; i <= x+2; i++)
 			for(int j = y-2; j <= y+2; j++)
 				if(i != x || j != y) {
-					cubes[pos].x = i;
-					cubes[pos].y = j;
-					cubes[pos].z = z + logsNum -2 + k;
+					cubes[pos].pos.x = i;
+					cubes[pos].pos.y = j;
+					cubes[pos].pos.z = z + logsNum -2 + k;
 					pos++;
 				}
 	
 	for(int k = 0; k < 2; k++)
 		for(int i = x-1; i <= x+1; i++)
 			for(int j = y-1; j <= y+1; j++) {
-				cubes[pos].x = i;
-				cubes[pos].y = j;
-				cubes[pos].z = z + logsNum + k;
+				cubes[pos].pos.x = i;
+				cubes[pos].pos.y = j;
+				cubes[pos].pos.z = z + logsNum + k;
 				pos++;
 			}
 }
 
-void Trees::Init(int _treesNum) {
-	treesNum = _treesNum;
+void Trees::Init(int treesNum) {
+	this->treesNum = treesNum;
 	trees = std::make_unique<Tree[]>(treesNum);
 	for(int i = 0; i < treesNum; i++)
 		trees[i].Init(GetRand(2, map.width-2), GetRand(2, map.height-2));

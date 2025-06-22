@@ -1,21 +1,18 @@
-#include <cstring> // для memset
-#include <iostream>
-#include <cstdlib> // для exit
-#include <string> // для оператора += для std::string
-
 #include "glcore.hpp"
 #include "texture.h"
 #include "resource.h"
 #include "gameconf.h"
 
-GLuint texField;
-GLuint texFlowerRed;
-GLuint texFlowerYellow;
-GLuint texGrass;
-GLuint texMushroom;
-GLuint texTree;
-GLuint texTree2;
-GLuint texWood;
+texture_t texUndefined = -1;
+
+texture_t texField;
+texture_t texFlowerRed;
+texture_t texFlowerYellow;
+texture_t texGrass;
+texture_t texMushroom;
+texture_t texTree;
+texture_t texTree2;
+texture_t texWood;
 
 void InitTextures() {
 	LoadConfigInfo();

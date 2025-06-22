@@ -4,16 +4,16 @@
 
 #include "glcore.hpp"
 #include "singleton.h"
+#include "types.hpp"
 
 class Object {
 public:
-	float x, y, z;
-	GLuint tex;
+	Vec3f pos;
+	texture_t tex;
 	float scale{1};
 
+	void NormalizeHeight();
 	void SetRandomPosition();
-	bool IsPlayerNearby(float distance);
-	bool IsPlayerFocusedOn();
 };
 
 class Objects : public LazySingleton<Objects> {

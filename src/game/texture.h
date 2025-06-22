@@ -6,12 +6,14 @@ struct UV {
 
 void InitTextures();
 
-extern GLuint texField;
-extern GLuint texFlowerRed;
-extern GLuint texFlowerYellow;
-extern GLuint texGrass;
-extern GLuint texMushroom;
-extern GLuint texTree;
-extern GLuint texTree2;
-extern GLuint texWood;
+extern texture_t texUndefined;
+
+extern texture_t texField;
+extern texture_t texFlowerRed;
+extern texture_t texFlowerYellow;
+extern texture_t texGrass;
+extern texture_t texMushroom;
+extern texture_t texTree;
+extern texture_t texTree2;
+extern texture_t texWood;
 

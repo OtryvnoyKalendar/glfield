@@ -4,7 +4,7 @@
 #include <array>
 #include <string>
 
-#include "glcore.hpp"
+#include <SFML/Audio.hpp>
 
 using AudioId = unsigned long int;
 

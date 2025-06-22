@@ -1,9 +1,13 @@
-# Prerequisites
-*.d
-
+# My gitignore
 build/
 build.log
 cached_bin_dir.txt
+
+
+
+
+# Prerequisites
+*.d
 
 # Object files
 *.o

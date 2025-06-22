@@ -4,16 +4,16 @@ class Program {
 public:
 	bool IsRunning();
 	void UpdateLogic();
-	void RenderGraphics();
 	void InitProgram();
-	void SelectShape();
 
 	Program();
-	~Program();
+	~Program() = default;
 private:
-	bool running = true;
+	bool running{true};
 
 	void Close();
 	void CheckMainEvents();
+	void SelectShape();
+	void RenderGraphics();
 };
 

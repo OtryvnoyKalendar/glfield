@@ -1,6 +1,7 @@
 #pragma once
 
 #include "glcore.hpp"
+#include "types.hpp"
 
 class Screen {
 public:
@@ -12,6 +13,8 @@ public:
 	void CalcAspectRatio();
 	void SetPerspective();
 	void SetPerspectiveAndLighting();
+	POINT GetCenter();
+
 	Screen();
 	Screen(int _width, int _height, const char* _name, bool isFullscreen=false);
 	~Screen() = default;

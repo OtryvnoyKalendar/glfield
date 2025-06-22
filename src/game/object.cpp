@@ -1,12 +1,11 @@
 #include <cstdlib>
 #include <iostream>
-#include <cmath>
 
 #include "object.h"
 #include "map.h"
 #include "getrand.h"
-#include "camera.h"
 #include "select.h"
+#include "player.h"
 
 namespace {
 	GLfloat verticesFlower[] = {
@@ -23,18 +22,14 @@ namespace {
 	};
 }
 
-bool Object::IsPlayerFocusedOn() {
-	return true;
-}
-
-bool Object::IsPlayerNearby(float distance) {
-	return std::sqrt(std::pow(x - camera.x, 2) + std::pow(y - camera.y, 2) + std::pow(z - camera.z, 2)) <= distance;
+void Object::NormalizeHeight() {
+	pos.z = map.GetHeight(pos.x, pos.y) - 0.1;
 }
 
 void Object::SetRandomPosition() {
-	x = GetRand(1, map.width-1);
-	y = GetRand(1, map.height-1);
-	z = map.GetHeight(x, y) - 0.1;
+	pos.x = GetRand(1, map.width-1);
+	pos.y = GetRand(1, map.height-1);
+	NormalizeHeight();
 }
 
 void Objects::DrawSelf() {
@@ -53,8 +48,10 @@ void Objects::DrawSelf() {
 	int selectColor = 1;
 
 	for(int i = 0; i < plantsNum; i++) {
-		if(IsSelectMode() && plants[i].IsPlayerNearby(10.5f)
-			&& !(plants[i].tex == texTree || plants[i].tex == texTree2)) {
+		Object& p = plants[i];
+
+		if(IsSelectMode() && player.IsNearbyToPos(10.5f, Vec3f({p.pos.x, p.pos.y, p.pos.z}))
+			&& !(p.tex == texTree || p.tex == texTree2)) {
 			glColor3ub(selectColor, 0, 0);
 			AddToSelectedObjects({i, selectColor});
 			selectColor += 1;
@@ -66,10 +63,10 @@ void Objects::DrawSelf() {
 			glColor3f(selfColorTmp, selfColorTmp, selfColorTmp);
 		}
 
-		glBindTexture(GL_TEXTURE_2D, plants[i].tex);
+		glBindTexture(GL_TEXTURE_2D, p.tex);
 		glPushMatrix();
-			glTranslatef(plants[i].x, plants[i].y, plants[i].z);
-			glScalef(plants[i].scale, plants[i].scale, plants[i].scale);
+			glTranslatef(p.pos.x, p.pos.y, p.pos.z);
+			glScalef(p.scale, p.scale, p.scale);
 			glDrawElements(GL_TRIANGLES, std::size(indexesFlower), GL_UNSIGNED_INT, indexesFlower);
 		glPopMatrix();
 	}
@@ -88,7 +85,7 @@ void Objects::Init() {
 	plants = std::make_unique<Object[]>(plantsNum);
 
 	for(int i = 0; i < plantsNum; i++) {
-		GLuint newTexture = texGrass;
+		texture_t newTexture = texGrass;
 		float newScale = 1;
 
 		if(i < grassNum) {

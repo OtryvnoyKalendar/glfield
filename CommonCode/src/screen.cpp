@@ -45,6 +45,12 @@ void Screen::SetPerspectiveAndLighting() {
 	glLoadIdentity();
 }
 
+POINT Screen::GetCenter() {
+	return POINT({
+		static_cast<int>(width)/2, static_cast<int>(height)/2
+	});
+}
+
 Screen::Screen() {
 	Init();
 }

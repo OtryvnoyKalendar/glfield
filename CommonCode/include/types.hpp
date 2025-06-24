@@ -1,31 +1,19 @@
 #pragma once
 
-#ifndef __WIN32__
-typedef struct {
+template <typename T>
+struct Rect {
+	T left;
+	T top;
+	T right;
+	T bottom;
+};
+
+struct Vec2i {
 	int x, y;
-} COORD, POINT;
+};
 
-struct POINTFLOAT {
+struct Vec2f {
 	float x, y;
-};
-
-struct RECT {
-	long left;
-	long top;
-	long right;
-	long bottom;
-};
-#else
-#include <windows.h>
-#endif
-
-
-// this is not present in windows.h
-struct RECTFLOAT {
-	float left;
-	float top;
-	float right;
-	float bottom;
 };
 
 struct Vec3f {

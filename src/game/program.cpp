@@ -25,6 +25,15 @@ Objects objects;
 Map map;
 Player player;
 
+void InitPlayer() {
+	player.Init(10, HealthStatus({15, 20}));
+}
+
+void CheckPlayerDeath() {
+	if(player.GetHealthStatus().health == 0)
+		InitPlayer();
+}
+
 bool Program::IsRunning() {
 	return screen.window.isOpen();
 }
@@ -59,6 +68,7 @@ void Program::UpdateLogic() {
 		SelectShape();
 	}
 	player.ProcessInput();
+	CheckPlayerDeath();
 }
 
 void ChangeSunAngle() {
@@ -77,7 +87,8 @@ void DrawShapes() {
 			Sky().DrawStars();
 			Sky().DrawSun();
 		}
-		player.Move();
+		player.ProcessEffects();
+		player.Move(!camera.GetCursorVisible());
 		Sky().ApplyLight();
 
 		map.DrawSelf();
@@ -123,11 +134,7 @@ void InitRenderingState() {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
-void Program::InitProgram() {
-	InitRenderingState();
-
-	InitTextures();
-	InitSounds();
+void Program::InitScene() {
 	audio.PlayMusic(mscRelax);
 
 	screen.SetPerspectiveAndLighting();
@@ -139,7 +146,16 @@ void Program::InitProgram() {
 	Sky::GetInstance().Init();
 	Hud::GetInstance();
 
-	player.Init(10, HealthStatus({15, 20}));
+	InitPlayer();
+}
+
+void Program::InitProgram() {
+	InitRenderingState();
+
+	InitTextures();
+	InitSounds();
+
+	InitScene();
 }
 
 Program::Program() {

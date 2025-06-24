@@ -13,7 +13,7 @@ public:
 	void CalcAspectRatio();
 	void SetPerspective();
 	void SetPerspectiveAndLighting();
-	POINT GetCenter();
+	Vec2i GetCenter();
 
 	Screen();
 	Screen(int _width, int _height, const char* _name, bool isFullscreen=false);

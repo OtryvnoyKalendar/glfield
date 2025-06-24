@@ -36,10 +36,10 @@ void Camera::Apply() {
 }
 
 void Camera::AutoTurnByMouse(float mouseSensitivity) {
-	POINT cursor{};
+	Vec2i cursor{};
 	cursor.x = sf::Mouse::getPosition(screen.window).x;
 	cursor.y = sf::Mouse::getPosition(screen.window).y;
-	const POINT base = screen.GetCenter();
+	const Vec2i base = screen.GetCenter();
 	Rotate((base.y-cursor.y) / mouseSensitivity, (base.x-cursor.x) / mouseSensitivity);
 	sf::Mouse::setPosition(sf::Vector2i(base.x, base.y), screen.window);
 }
@@ -55,7 +55,7 @@ bool Camera::GetCursorVisible() {
 void Camera::SetCursorVisible(bool visible) {
 	cursorVisible = visible;
 	if(visible == false) {
-		const POINT center = screen.GetCenter();
+		const Vec2i center = screen.GetCenter();
 		sf::Mouse::setPosition(sf::Vector2i(center.x, center.y), screen.window);
 	}
 	ApplySettings();

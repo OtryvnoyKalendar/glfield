@@ -1,4 +1,5 @@
 #include <cmath>
+#include <algorithm> // for std::clamp
 
 #include "screen.hpp"
 #include "camera.h"
@@ -7,7 +8,7 @@
 #include "sounds.h"
 #include "onepress.h"
 
-bool Player::IsNearbyToPos(float distance, Vec3f pos) {
+bool Player::IsNearbyToPos(const float distance, const Vec3f pos) {
 	using namespace std;
 
 	return sqrt(
@@ -25,17 +26,31 @@ void Player::ProcessInput() {
 		camera.SetCursorVisible(!camera.GetCursorVisible());
 }
 
-void Player::Move() {
-	if(!screen.window.hasFocus())
-		return;
-
-	const bool moveAllowed = !camera.GetCursorVisible();
-	const float jumpHeight{4.0};
+void Player::SetHeight(bool jumpAllowed) {
 	static float jump{0};
 	const float jumpPlus{0.04};
 	float dy{0};
+
+	if(jump > 0 && jump < 1) {
+		jump += jumpPlus;
+		if(jump > 1)
+			jump = 0;
+	}
+	else {
+		if(jumpAllowed && sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::Space)) {
+			jump += jumpPlus;
+			audio.PlaySound(sndGrass);
+		}
+	}
+	dy = std::sin(M_PI*jump)*jumpHeight;
+
+	camera.z = map.GetHeight(camera.x, camera.y) + selfHeight + dy;
+}
+
+void Player::Move(const bool moveAllowed) {
+	if(!screen.window.hasFocus())
+		return;
 	
-	float playerHeight{1.7f};
 	int moveForvard{0};
 	int moveRight{0};
 
@@ -50,30 +65,35 @@ void Player::Move() {
 			moveRight = 1;
 	}
 
-	if(jump > 0 && jump < 1) {
-		jump += jumpPlus;
-		if(jump > 1)
-			jump = 0;
-	}
-	else {
-		if(moveAllowed && sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::Space)) {
-			jump += jumpPlus;
-			audio.PlaySound(sndGrass);
-		}
-	}
-
-	dy = std::sin(M_PI*jump)*jumpHeight;
-
-	float runSpeed{0};
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::LShift))
-		runSpeed = 0.25f;
-	else
-		runSpeed = 0.1f;
-
 	if(moveAllowed)
-		camera.MoveDirection(moveForvard, moveRight, runSpeed);
-	camera.z = map.GetHeight(camera.x, camera.y) + playerHeight + dy;
+		camera.MoveDirection(moveForvard, moveRight, speed);
+	SetHeight(moveAllowed);
 	camera.Apply();
+
+	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::LShift))
+		speed = runSpeed;
+	else
+		speed = normalSpeed;
+}
+
+void Player::OnDeath() {}
+
+void Player::ProcessEffects() {
+	for(auto it = effects.begin(); it != effects.end(); ) {
+		if((*it)->IsEnd())
+			it = effects.erase(it);
+		else
+			++it;
+	}
+}
+
+void Player::ApplyHealthDelta(const int delta) {
+	healthStatus.health += delta;
+
+	if(healthStatus.health <= 0)
+		OnDeath();
+
+	healthStatus.health = std::clamp(healthStatus.health, 0, healthStatus.healthMax);
 }
 
 const std::vector<texture_t>& Player::GetBag() {
@@ -93,8 +113,18 @@ void Player::InitBag(size_t bagCapacity) {
 }
 
 void Player::Init(size_t bagCapacity, HealthStatus healthStatus) {
-	InitBag(bagCapacity);
 	this->healthStatus = healthStatus;
+
+	InitBag(bagCapacity);
+	if(!HasEffect(typeid(EffectHunger)))
+		effects.emplace_back(std::make_unique<EffectHunger>());
+}
+
+bool Player::HasEffect(const std::type_info& effectType) {
+	for(const auto& i : effects)
+		if(typeid((*i)) == effectType)
+			return true;
+	return false;
 }
 
 bool Player::AddObjectToBag(texture_t object) {

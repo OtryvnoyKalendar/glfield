@@ -11,6 +11,7 @@
 [OpenGL - Урок 20 - Создаем деревья как в MineCraft.](https://www.youtube.com/watch?v=wquSuybNWBw)  
 [OpenGL - Урок 21 - Как уйти в закат (Добавляем солнце и смену дня и ночи)](http://www.youtube.com/watch?v=6lnibnDBWSM)  
 [OpenGL - Урок 25 - Симулятор пылесоса! Механика сбора ресурсов. Анимация сбора.](https://www.youtube.com/watch?v=nIdb1hhu1lg)  
+[OpenGL - Урок 26 - Пишем игру симулятор грибника. Добавляем интерфейс, и едим грибочки.](https://www.youtube.com/watch?v=wuMT4uk51-Y)  
 
 ### Зависимости
 1. компилятор под вашу платформу (`gcc`/`clang`, `mingw`)

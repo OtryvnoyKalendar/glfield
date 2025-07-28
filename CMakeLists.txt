@@ -18,7 +18,6 @@ endfunction()
 if(WIN_CROSS)
 	message("Сборка на Linux под Windows")
 	if(WIN_32BIT)
-		message("Нужно поменять dll файлы на те, что лежат в win32, если раньше вы использовали 64-битную сборку")
 		set_compilers(i686-w64-mingw32-gcc i686-w64-mingw32-g++)
 		set_bin_dir(windows-32bit)
 	else()
@@ -27,7 +26,7 @@ if(WIN_CROSS)
 	endif()
 elseif(WIN32)
 	message("Сборка на Windows")
-	message("Cборка с mingw32-g++ не проверялась и может не работать")
+	message(WARNING "Cборка с mingw32-g++ не проверялась и может не работать")
 	set_compilers(mingw32-gcc mingw32-g++)
 	set_bin_dir(windows-64bit)
 elseif(APPLE)
@@ -42,6 +41,7 @@ else()
 	message(FATAL_ERROR "Неизвестная операционная система")
 endif()
 
+set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 
 if(WIN_CROSS OR WIN32)
 	set(FILE_EXTENSION ".exe")
@@ -50,9 +50,13 @@ else()
 endif()
 project("glfield${FILE_EXTENSION}")
 
-add_compile_options(
-	-Wall -Wextra -pedantic -std=c++17 -O2
-)
+find_package(SFML COMPONENTS Network Graphics Window Audio System CONFIG REQUIRED)
+
+if(MSVC)
+    add_compile_options(/W4 /permissive- /std:c++17 /O2)
+else()
+    add_compile_options(-Wall -Wextra -pedantic -std=c++17 -O2)
+endif()
 
 if(WIN_CROSS)
 	add_compile_definitions(
@@ -69,11 +73,11 @@ include_directories("${COMMON_CODE_DIR}/include")
 
 file(GLOB COMMON_SOURCES "${COMMON_CODE_DIR}/src/*.cpp")
 file(GLOB SOURCES "${PROJECT_SOURCE_DIR}/src/**/*.cpp")
-
-add_executable(${PROJECT_NAME} src/main.cpp ${COMMON_SOURCES} ${SOURCES})
 if(PRINT_FOUND_SOURCES)
 	message("PROJECT_SOURCE_DIR: ${SOURCES} ${COMMON_SOURCES}")
 endif()
+
+add_executable(${PROJECT_NAME} src/main.cpp ${COMMON_SOURCES} ${SOURCES})
 
 if(WIN_CROSS)
 	add_compile_options(
@@ -103,7 +107,7 @@ elseif(WIN32)
 else()
 	target_link_libraries(${PROJECT_NAME}
 		GL GLU
-		sfml-graphics sfml-window sfml-system sfml-audio sfml-network
+		SFML::Network SFML::Graphics SFML::Window SFML::Audio SFML::System
 	)
 endif()
 

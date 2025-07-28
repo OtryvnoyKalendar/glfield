@@ -19,13 +19,17 @@ def print_message(color: str, mes: str) -> None:
 def print_dashes() -> None:
 	print_message(GREEN, "----")
 
+def print_exit_error(mes: str) -> None:
+    print_message(RED, mes)
+    exit(1)
+
 def ensure_directory_exists(build_path: str) -> None:
     if not os.path.isdir(build_path):
         os.makedirs(build_path)
         print_message(RED, f"The {build_path} directory was not found, so a new {build_path} directory must be created")
         time.sleep(1)
 
-def run_cmake(build_path: str, is_debug_mode: bool) -> None:
+def run_cmake(build_path: str, is_debug_mode: bool, is_mingw_mode: bool) -> None:
     print_message(BLUE, "Launching cmake")
 
     ensure_directory_exists(build_path)
@@ -34,11 +38,19 @@ def run_cmake(build_path: str, is_debug_mode: bool) -> None:
     if is_debug_mode:
         debug_mode="Debug"
 
-    os.system(f"cmake -S . -B {build_path} -DCMAKE_BUILD_TYPE={debug_mode}")
+    compiler_mode=""
+    if is_mingw_mode:
+        compiler_mode="-G 'MinGW Makefiles'"
+
+    os.system(f"cmake {compiler_mode} -S . -B {build_path} -DCMAKE_BUILD_TYPE={debug_mode} --preset vcpkg")
     os.chdir(build_path)
-    if os.system("cmake --build . --parallel") != 0:
-        print_message(RED, "Compilation or cmake build error")
-        exit(1)
+    build_error = "Compilation or cmake build error"
+    if is_mingw_mode:
+        if os.system("mingw32-make") != 0:
+            print_exit_error(build_error)
+    else:
+        if os.system("cmake --build . --parallel") != 0:
+            print_exit_error(build_error)
     os.chdir("..")
 
 def get_platform() -> str:
@@ -47,8 +59,7 @@ def get_platform() -> str:
         with open(filename) as file:
             return file.readline().strip()
     except FileNotFoundError:
-        print_message(RED, f"File '{filename}' not found")
-        exit(1)
+        print_exit_error(f"File '{filename}' not found")
 
 def find_first_file_with_extension(directory: str, extension: str) -> str:
     """
@@ -84,8 +95,7 @@ def run_program() -> int:
     elif unix_file != "":
         result = os.system(f"./{unix_file}")
     else:
-        print_message(RED, "The executable file was not found")
-        exit(1)
+        print_exit_error("The executable file was not found")
 
     return result
 
@@ -98,14 +108,16 @@ def configure_argparse(parser: argparse.ArgumentParser) -> None:
                         help="Just compile the program")
     parser.add_argument("-p", "--ronly", action="store_true",
                         help="Just run the program")
+    parser.add_argument("-m", "--mingw", action="store_true",
+                        help="Assembly using mingw32-make and 'MinGW Makefiles'")
 
-def print_return_value(return_value):
+def print_return_value(return_value) -> None:
     return_value_color = GREEN
     if return_value != 0:
         return_value_color = RED
     print_message(return_value_color, f"The program returns: {return_value}")
 
-def main():
+def main() -> None:
     script_version = "2.0"
     build_path = "build"
 
@@ -121,7 +133,7 @@ def main():
         exit(0)
 
     if not args.ronly:
-        run_cmake(build_path, args.debug)
+        run_cmake(build_path, args.debug, args.mingw)
 
     if not args.conly:
         print_dashes()

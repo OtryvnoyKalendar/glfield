@@ -3,8 +3,8 @@ build/
 build.log
 cached_bin_dir.txt
 .ruff*
-
-
+*vgcore*
+todo*
 
 # Prerequisites
 *.d

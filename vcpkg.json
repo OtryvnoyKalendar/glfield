@@ -1,0 +1,14 @@
+{
+  "name": "glfield",
+  "version": "0.26.0",
+  "builtin-baseline": "bf1a3841b259bc4a14937e4c2f618914018e53a8",
+  "dependencies": [
+    "sfml"
+  ],
+  "overrides": [
+    {
+      "name": "sfml",
+      "version": "3.0.0#1"
+    }
+  ]
+}

@@ -29,6 +29,7 @@ void InitPlayer() {
 	size_t bagCapacity = 10;
 	player.Init(bagCapacity, HealthStatus({15, 20}));
 	map.SetRandomPosition(camera.x, camera.y, camera.z);
+	Sky().RandomizeSunAngle();
 }
 
 void CheckPlayerDeath() {
@@ -73,16 +74,8 @@ void Program::UpdateLogic() {
 	CheckPlayerDeath();
 }
 
-void ChangeSunAngle() {
-	alpha += 0.02f;
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::U))
-		alpha += 1.2f;
-	if(alpha > 180)
-		alpha -= 360;
-}
-
 void DrawShapes() {
-	ChangeSunAngle();
+	Sky().ChangeSunAngle();
 
 	glPushMatrix();
 		if(!IsSelectMode()) {

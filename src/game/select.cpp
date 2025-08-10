@@ -33,8 +33,8 @@ void Program::SelectShape() {
 
 	GLubyte color[3];
 
-	float mx = sf::Mouse::getPosition(screen.window).x;
-	float my = sf::Mouse::getPosition(screen.window).y;
+	const float mx = sf::Mouse::getPosition(screen.window).x;
+	const float my = sf::Mouse::getPosition(screen.window).y;
 	
 	glReadPixels(mx, my, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, color);
 	if(color[0] > 0) {

@@ -7,6 +7,8 @@
 #include "map.h"
 #include "sounds.h"
 #include "onepress.h"
+#include "hud.h"
+#include "texture.h"
 
 bool Player::IsNearbyToPos(const float distance, const Vec3f pos) {
 	using namespace std;
@@ -18,12 +20,35 @@ bool Player::IsNearbyToPos(const float distance, const Vec3f pos) {
 	) <= distance;
 }
 
+void Player::ProcessBagUsage() {
+	const int dx = Hud().GetBagOffset().x;
+	const int dy = Hud().GetBagOffset().y;
+	const int slotSize = Hud().GetSlotPixelSize();
+
+	const float mx = sf::Mouse::getPosition(screen.window).x;
+	const float my = sf::Mouse::getPosition(screen.window).y;
+
+	if(IsMouseClicked::Left() && (my > dy && my < dy+slotSize))
+		for(size_t i = 0; i < GetBagCapacity(); i++)
+			if((mx > dx + i*slotSize) && (mx < dx + (i+1)*slotSize)) {
+				if(bag[i] == texMushroom)
+					ApplyHealthDelta(2);
+				bag[i] = texUndefined;
+			}
+}
+
 void Player::ProcessInput() {
 	if(!screen.window.hasFocus())
 		return;
 
 	if(IsKeyPressedOnce(sf::Keyboard::Scan::E))
 		camera.SetCursorVisible(!camera.GetCursorVisible());
+
+	if(IsKeyPressedOnce(sf::Keyboard::Scan::R))
+		ApplyHealthDelta(-healthStatus.healthMax);
+
+	if(camera.GetCursorVisible())
+		ProcessBagUsage();
 }
 
 void Player::SetHeight(bool jumpAllowed) {

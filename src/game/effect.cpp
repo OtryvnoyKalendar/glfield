@@ -18,7 +18,7 @@ bool Effect::IsEnd() {
 
 
 EffectHunger::EffectHunger()
-	: Effect(disableCounterValue, disableCounterValue, 50) {};
+	: Effect(disableCounterValue, disableCounterValue, 200) {};
 EffectSpeedBoost::EffectSpeedBoost()
 	: Effect(disableCounterValue, 1000, disableCounterValue) {};
 EffectNightVision::EffectNightVision()

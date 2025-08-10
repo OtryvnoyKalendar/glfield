@@ -8,9 +8,23 @@ namespace {
 	GLfloat verticesSun[] = {
 		-1,-1,0, 1,-1,0, 1,1,0, -1,1,0,
 	};
+
+	float sunAngle{0};
 }
-float alpha{0};
+
 GLfloat Sky::verticesStars[Sky::verticesStarsNum]{};
+
+void Sky::ChangeSunAngle() {
+	sunAngle += 0.02f;
+	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::U))
+		sunAngle += 1.2f;
+	if(sunAngle > 180)
+		sunAngle -= 360;
+}
+
+void Sky::RandomizeSunAngle() {
+	sunAngle += static_cast<float>(GetRand(0, 1000));
+}
 
 void RotateToCamera() {
 	glRotatef(-camera.GetXRot(), 1, 0, 0);
@@ -20,7 +34,7 @@ void RotateToCamera() {
 void Sky::DrawSun() {
 	glPushMatrix();
 		RotateToCamera();
-		glRotatef(alpha, 0, 1, 0);
+		glRotatef(sunAngle, 0, 1, 0);
 		glTranslatef(0, 0, 20);
 
 		glDisable(GL_TEXTURE_2D);
@@ -37,7 +51,7 @@ void Sky::DrawSun() {
 
 void Sky::ApplyLight() {
 	glPushMatrix();
-		glRotatef(alpha, 0, 1, 0);
+		glRotatef(sunAngle, 0, 1, 0);
 		GLfloat position[] = {0, 0, 1, 0};
 		glLightfv(GL_LIGHT0, GL_POSITION, position);
 
@@ -57,11 +71,11 @@ void Sky::Init() {
 }
 
 void Sky::DrawBackground() {
-	skyBright = 1.f - (abs(alpha) / 180.f);
+	skyBright = 1.f - (abs(sunAngle) / 180.f);
 	glClearColor(0.6f * skyBright, 0.8f * skyBright, 1.0f * skyBright, 0.0f);
 
 	const float sunset{40.f};
-	sunsetValue = 90 - abs(alpha);
+	sunsetValue = 90 - abs(sunAngle);
 	sunsetValue = sunset - abs(sunsetValue);
 	sunsetValue = sunsetValue < 0 ? 0 : sunsetValue / sunset;
 }

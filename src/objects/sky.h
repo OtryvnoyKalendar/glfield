@@ -3,12 +3,12 @@
 #include "glcore.hpp"
 #include "singleton.h"
 
-extern float alpha;
-
 class Sky : public LazySingleton<Sky> {
 public:
 	void DrawSun();
 	void ApplyLight();
+	void ChangeSunAngle();
+	void RandomizeSunAngle();
 	void DrawStars();
 	void DrawBackground();
 	

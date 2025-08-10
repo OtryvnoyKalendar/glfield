@@ -37,7 +37,7 @@ void DrawCrosshair(RgbaColor color, const float cursorSize,
 	glDisableClientState(GL_VERTEX_ARRAY);
 }
 
-void DrawBag(const int offsetX, const int offsetY, const int slotPixelSize) {
+void Hud::DrawBag() {
 	const size_t tmp_capacity = player.GetBagCapacity();
 	const std::vector<texture_t>& tmp_bag = player.GetBag();
 	glEnableClientState(GL_VERTEX_ARRAY);
@@ -46,7 +46,7 @@ void DrawBag(const int offsetX, const int offsetY, const int slotPixelSize) {
 	glTexCoordPointer(2, GL_FLOAT, 0, UVBagSlot);
 		for(size_t i = 0; i < tmp_capacity; i++) {
 			glPushMatrix();
-				glTranslatef(offsetX + i*slotPixelSize, offsetY, 0);
+				glTranslatef(bagOffset.x + i*slotPixelSize, bagOffset.y, 0);
 				glScalef(slotPixelSize, slotPixelSize, 1);
 				glColor3ub(110, 95, 73);
 				glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
@@ -68,14 +68,14 @@ void DrawBag(const int offsetX, const int offsetY, const int slotPixelSize) {
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
-void DrawHealth(const int offsetX, const int offsetY, const int scale) {
+void DrawHealth(const Vec2i offset, const int scale) {
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(2, GL_FLOAT, 0, verticesHeart);
 		int tmp_healthMax = player.GetHealthStatus().healthMax;
 		int tmp_health = player.GetHealthStatus().health;
 		for(int i = 0; i < tmp_healthMax; i++) {
 			glPushMatrix();
-				glTranslatef(offsetX + i*scale, offsetY, 0);
+				glTranslatef(offset.x + i*scale, offset.y, 0);
 				glScalef(scale, scale, 1);
 				if(i < tmp_health)
 					glColor3f(1, 0, 0);
@@ -87,9 +87,17 @@ void DrawHealth(const int offsetX, const int offsetY, const int scale) {
 	glDisableClientState(GL_VERTEX_ARRAY);
 }
 
+const Vec2i& Hud::GetBagOffset() {
+	return bagOffset;
+}
+
+const int& Hud::GetSlotPixelSize() {
+	return slotPixelSize;
+}
+
 void Hud::DrawPlayerStatusBar() {
-	DrawBag(10, 10, 60);
-	DrawHealth(10, 80, 30);
+	DrawBag();
+	DrawHealth(Vec2i({10, 80}), 30);
 }
 
 void Hud::DrawSelf() {

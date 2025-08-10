@@ -40,6 +40,7 @@ private:
 	void OnDeath();
 	void InitBag(size_t bagCapacity);
 	void SetHeight(bool jumpAllowed);
+	void ProcessBagUsage();
 };
 
 extern Player player; 

@@ -22,18 +22,8 @@ namespace {
 	};
 }
 
-void Object::NormalizeHeight() {
-	pos.z = map.GetHeight(pos.x, pos.y) - 0.1;
-}
-
-void Object::SetRandomPosition() {
-	pos.x = GetRand(1, map.width-1);
-	pos.y = GetRand(1, map.height-1);
-	NormalizeHeight();
-}
-
 void Objects::DrawSelf() {
-	// текстуры и другие настройки уже должны быть включены
+	// textures and other settings should already be enabled
 	if(!IsSelectMode())
 		glEnable(GL_TEXTURE_2D);
 	glEnable(GL_VERTEX_ARRAY);
@@ -50,8 +40,9 @@ void Objects::DrawSelf() {
 	for(int i = 0; i < plantsNum; i++) {
 		Object& p = plants[i];
 
-		if(IsSelectMode() && player.IsNearbyToPos(10.5f, Vec3f({p.pos.x, p.pos.y, p.pos.z}))
-			&& !(p.tex == texTree || p.tex == texTree2)) {
+		if(IsSelectMode()
+				&& player.IsNearbyToPos(10.5f, Vec3f({p.pos.x, p.pos.y, p.pos.z}))
+				&& !(p.tex == texTree || p.tex == texTree2)) {
 			glColor3ub(selectColor, 0, 0);
 			AddToSelectedObjects({i, selectColor});
 			selectColor += 1;
@@ -113,7 +104,7 @@ void Objects::Init() {
 
 		plants[i].tex = newTexture;
 		plants[i].scale = newScale;
-		plants[i].SetRandomPosition();
+		map.SetRandomPosition(plants[i].pos.x, plants[i].pos.y, plants[i].pos.z);
 	}
 }
 

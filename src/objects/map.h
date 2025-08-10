@@ -16,6 +16,11 @@ public:
 	bool IsCoordExist(float x, float y);
 	float GetHeight(float x, float y);
 	Map();
+
+	void NormalizeHeight(const float xPos, const float yPos, float& zPos);
+	void LiftCameraOffGround(const float height);
+	void SetRandomPosition(float& xPos, float& yPos, float& zPos);
+	Vec2f GetRandomPosition();
 private:
 	int hillsNum;
 	static const int indexesNum = (width-1)*(height-1)*6;
@@ -25,7 +30,7 @@ private:
 	UV arrayUV[width][height];
 	GLuint arrayIndexes[width-1][height-1][6];
 
-	void CalcNormals(Cell a, Cell b, Cell c, Cell *n);
+	void CalcNormals(Cell a, Cell b, Cell c, Cell* n);
 	void CreateHill(int x, int y, int rad, int hillHeight);
 };
 

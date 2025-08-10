@@ -3,6 +3,7 @@
 
 #include "map.h"
 #include "getrand.h"
+#include "camera.h"
 
 void Map::CreateHill(int x, int y, int rad, int hillHeight) {
 	for(int i = x-rad; i <= x+rad; i++)
@@ -89,7 +90,7 @@ void Map::DrawSelf() {
 	glDisable(GL_TEXTURE_2D);
 }
 
-void Map::CalcNormals(Cell a, Cell b, Cell c, Cell *n) {
+void Map::CalcNormals(Cell a, Cell b, Cell c, Cell* n) {
 	float wrki;
 	Cell v1, v2;
 
@@ -110,5 +111,28 @@ void Map::CalcNormals(Cell a, Cell b, Cell c, Cell *n) {
 	n->x /= wrki;
 	n->y /= wrki;
 	n->z /= wrki;
+}
+
+void Map::NormalizeHeight(const float xPos, const float yPos, float& zPos) {
+	zPos = GetHeight(xPos, yPos) - 0.1;
+}
+
+void Map::LiftCameraOffGround(const float height) {
+	NormalizeHeight(camera.x, camera.y, camera.z);
+	camera.z += height;
+}
+
+Vec2f Map::GetRandomPosition() {
+	return Vec2f{
+		static_cast<float>(GetRand(1, width-1)),
+		static_cast<float>(GetRand(1, height-1)),
+	};
+}
+
+void Map::SetRandomPosition(float& xPos, float& yPos, float& zPos) {
+	const Vec2f newPos = GetRandomPosition();
+	xPos = newPos.x;
+	yPos = newPos.y;
+	NormalizeHeight(xPos, yPos, zPos);
 }
 

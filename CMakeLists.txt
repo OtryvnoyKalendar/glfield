@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
 
 set(PRINT_FOUND_SOURCES false)
+set(PRINT_FOUND_INCLUDE_DIRECTORIES false)
 
 set(WIN_CROSS false)
 set(WIN_32BIT false)
@@ -65,19 +66,34 @@ if(WIN_CROSS)
 	)
 endif()
 
-set(COMMON_CODE_DIR "./CommonCode")
+set(CODE_DIRECTORIES "CommonCode" "src")
 
-include_directories(src/game)
-include_directories(src/)
-include_directories("${COMMON_CODE_DIR}/include")
-
-file(GLOB COMMON_SOURCES "${COMMON_CODE_DIR}/src/*.cpp")
-file(GLOB SOURCES "${PROJECT_SOURCE_DIR}/src/**/*.cpp")
-if(PRINT_FOUND_SOURCES)
-	message("PROJECT_SOURCE_DIR: ${SOURCES} ${COMMON_SOURCES}")
+set(INCLUDE_DIRS)
+foreach(dir IN LISTS CODE_DIRECTORIES)
+    file(GLOB_RECURSE HEADER_FILES "${dir}/*.h" "${dir}/*.hpp")
+    foreach(header_file IN LISTS HEADER_FILES)
+        get_filename_component(header_dir "${header_file}" DIRECTORY)
+        list(FIND INCLUDE_DIRS "${header_dir}" index)
+        if(index EQUAL -1)
+            list(APPEND INCLUDE_DIRS "${header_dir}")
+        endif()
+    endforeach()
+endforeach()
+if(PRINT_FOUND_INCLUDE_DIRECTORIES)
+	message("Include directories with headers: ${INCLUDE_DIRS}")
 endif()
+include_directories(${INCLUDE_DIRS})
 
-add_executable(${PROJECT_NAME} src/main.cpp ${COMMON_SOURCES} ${SOURCES})
+set(ALL_SOURCES)
+foreach(dir IN LISTS CODE_DIRECTORIES)
+    file(GLOB_RECURSE SOURCES "${dir}/*.cpp")
+	if(PRINT_FOUND_SOURCES)
+		message("Found sources: ${SOURCES}")
+	endif()
+    list(APPEND ALL_SOURCES ${SOURCES})
+endforeach()
+
+add_executable(${PROJECT_NAME} ${ALL_SOURCES})
 
 if(WIN_CROSS)
 	add_compile_options(

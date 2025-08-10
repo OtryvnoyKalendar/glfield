@@ -3,6 +3,7 @@
 #include "animation.h"
 #include "camera.h"
 #include "player.h"
+#include "map.h"
 
 ObjectAnimation animPickingUp;
 
@@ -21,12 +22,13 @@ void ObjectAnimation::Play() {
 		object->pos.x += dx;
 		object->pos.y += dy;
 		object->pos.z += dz;
+
 		stepsNum -= 1;
 		if(stepsNum < 1) {
 			if(player.AddObjectToBag(object->tex))
-				object->SetRandomPosition();
+				map.SetRandomPosition(object->pos.x, object->pos.y, object->pos.z);
 			else
-				object->NormalizeHeight();
+				map.NormalizeHeight(object->pos.x, object->pos.y, object->pos.z);
 
 			object = nullptr;
 		}

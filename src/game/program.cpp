@@ -26,7 +26,9 @@ Map map;
 Player player;
 
 void InitPlayer() {
-	player.Init(10, HealthStatus({15, 20}));
+	size_t bagCapacity = 10;
+	player.Init(bagCapacity, HealthStatus({15, 20}));
+	map.SetRandomPosition(camera.x, camera.y, camera.z);
 }
 
 void CheckPlayerDeath() {
@@ -138,7 +140,9 @@ void Program::InitScene() {
 	audio.PlayMusic(mscRelax);
 
 	screen.SetPerspectiveAndLighting();
-	camera.Init(10, 10, 1.7, 100, 270, 0.1, false);
+
+	const float xRot = 100; const float zRot = 270;
+	camera.Init(Vec3f({10, 10, 1.7}), Vec2f({xRot, zRot}), 0.1, false);
 
 	map.Init(10);
 	objects.Init();

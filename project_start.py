@@ -42,6 +42,7 @@ def run_cmake(build_path: str, is_debug_mode: bool, is_mingw_mode: bool) -> None
     if is_mingw_mode:
         compiler_mode="-G 'MinGW Makefiles'"
 
+    os.environ["VCPKG_DISABLE_METRICS"] = "1"
     os.system(f"cmake {compiler_mode} -S . -B {build_path} -DCMAKE_BUILD_TYPE={debug_mode} --preset vcpkg")
     os.chdir(build_path)
     build_error = "Compilation or cmake build error"

@@ -6,11 +6,11 @@
 #include "types.hpp"
 #include "screen.hpp"
 
-void Camera::Init(float _x, float _y, float _z, float _xRot, float _zRot, float _speed, bool _cursorVisible) {
-	x = _x; y = _y; z = _z;
-	xRot = _xRot; zRot = _zRot;
-	speed = _speed;
-	cursorVisible = _cursorVisible;
+void Camera::Init(Vec3f position, Vec2f rotation, float speed, bool cursorVisible) {
+	x = position.x; y = position.y; z = position.z;
+	xRot = rotation.x; zRot = rotation.y;
+	this->speed = speed;
+	this->cursorVisible = cursorVisible;
 
 	ApplySettings();
 }

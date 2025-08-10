@@ -43,8 +43,7 @@ void Player::SetHeight(bool jumpAllowed) {
 		}
 	}
 	dy = std::sin(M_PI*jump)*jumpHeight;
-
-	camera.z = map.GetHeight(camera.x, camera.y) + selfHeight + dy;
+	map.LiftCameraOffGround(selfHeight + dy);
 }
 
 void Player::Move(const bool moveAllowed) {

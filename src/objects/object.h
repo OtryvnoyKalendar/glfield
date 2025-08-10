@@ -11,9 +11,6 @@ public:
 	Vec3f pos;
 	texture_t tex;
 	float scale{1};
-
-	void NormalizeHeight();
-	void SetRandomPosition();
 };
 
 class Objects : public LazySingleton<Objects> {

@@ -30,6 +30,7 @@ void EffectHunger::Use() {
 
 void EffectSpeedBoost::Use() {
 	player.speed = 0.6f;
+	player.SetJumpBoost(3.f);
 }
 
 void EffectNightVision::Use() {}

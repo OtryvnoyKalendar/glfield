@@ -54,12 +54,19 @@ void Objects::DrawSelf() {
 			glColor3f(selfColorTmp, selfColorTmp, selfColorTmp);
 		}
 
+		const bool isNightVision = p.tex == texMushroom && player.HasEffect(typeid(EffectNightVision));
+		if(isNightVision)
+			glDisable(GL_LIGHTING);
+
 		glBindTexture(GL_TEXTURE_2D, p.tex);
 		glPushMatrix();
 			glTranslatef(p.pos.x, p.pos.y, p.pos.z);
 			glScalef(p.scale, p.scale, p.scale);
 			glDrawElements(GL_TRIANGLES, std::size(indexesFlower), GL_UNSIGNED_INT, indexesFlower);
 		glPopMatrix();
+
+		if(isNightVision)
+			glEnable(GL_LIGHTING);
 	}
 	
 	glDisable(GL_TEXTURE_COORD_ARRAY);

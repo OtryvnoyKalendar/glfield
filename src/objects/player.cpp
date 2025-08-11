@@ -1,5 +1,5 @@
 #include <cmath>
-#include <algorithm> // for std::clamp
+#include <algorithm> // for std::clamp, std::count
 
 #include "screen.hpp"
 #include "camera.h"
@@ -20,6 +20,21 @@ bool Player::IsNearbyToPos(const float distance, const Vec3f pos) {
 	) <= distance;
 }
 
+size_t Player::GetObjectsNum(const texture_t objectType) {
+	return std::count(bag.begin(), bag.end(), objectType);
+}
+
+void Player::RemoveObjects(const texture_t objectType, const size_t number) {
+	size_t removed = 0;
+	for (auto& i : bag) {
+		if (i == objectType) {
+			i = texUndefined;
+			if(++removed == number)
+				break;
+		}
+	}
+}
+
 void Player::ProcessBagUsage() {
 	const int dx = Hud().GetBagOffset().x;
 	const int dy = Hud().GetBagOffset().y;
@@ -31,10 +46,32 @@ void Player::ProcessBagUsage() {
 	if(IsMouseClicked::Left() && (my > dy && my < dy+slotSize))
 		for(size_t i = 0; i < GetBagCapacity(); i++)
 			if((mx > dx + i*slotSize) && (mx < dx + (i+1)*slotSize)) {
-				if(bag[i] == texMushroom)
+				const size_t necessaryForEffect = 5;
+				if(bag[i] == texMushroom) {
 					ApplyHealthDelta(2);
+				}
+				else if(bag[i] == texFlowerRed) {
+					if(GetObjectsNum(texFlowerRed) >= necessaryForEffect) {
+						RemoveObjects(texFlowerRed, necessaryForEffect);
+						effects.emplace_back(std::make_unique<EffectSpeedBoost>());
+						continue;
+					}
+				}
+				else if(bag[i] == texFlowerYellow) {
+					if(GetObjectsNum(texFlowerYellow) >= necessaryForEffect) {
+						RemoveObjects(texFlowerYellow, necessaryForEffect);
+						effects.emplace_back(std::make_unique<EffectNightVision>());
+						continue;
+					}
+				}
 				bag[i] = texUndefined;
 			}
+}
+
+void Player::SetJumpBoost(float boost) {
+	if(boost < 0)
+		boost = 0;
+	jumpBoost = boost;
 }
 
 void Player::ProcessInput() {
@@ -44,7 +81,7 @@ void Player::ProcessInput() {
 	if(IsKeyPressedOnce(sf::Keyboard::Scan::E))
 		camera.SetCursorVisible(!camera.GetCursorVisible());
 
-	if(IsKeyPressedOnce(sf::Keyboard::Scan::R))
+	if(IsKeyPressedOnce(sf::Keyboard::Scan::K))
 		ApplyHealthDelta(-healthStatus.healthMax);
 
 	if(camera.GetCursorVisible())
@@ -67,8 +104,9 @@ void Player::SetHeight(bool jumpAllowed) {
 			audio.PlaySound(sndGrass);
 		}
 	}
-	dy = std::sin(M_PI*jump)*jumpHeight;
+	dy = std::sin(M_PI*jump)*jumpHeight*jumpBoost;
 	map.LiftCameraOffGround(selfHeight + dy);
+	jumpBoost = 1.f;
 }
 
 void Player::Move(const bool moveAllowed) {
@@ -136,19 +174,19 @@ void Player::InitBag(size_t bagCapacity) {
 	bag.assign(bagCapacity, texUndefined);
 }
 
+bool Player::HasEffect(const std::type_info& effectType) {
+	for(const auto& i : effects)
+		if(typeid((*i)) == effectType)
+			return true;
+	return false;
+}
+
 void Player::Init(size_t bagCapacity, HealthStatus healthStatus) {
 	this->healthStatus = healthStatus;
 
 	InitBag(bagCapacity);
 	if(!HasEffect(typeid(EffectHunger)))
 		effects.emplace_back(std::make_unique<EffectHunger>());
-}
-
-bool Player::HasEffect(const std::type_info& effectType) {
-	for(const auto& i : effects)
-		if(typeid((*i)) == effectType)
-			return true;
-	return false;
 }
 
 bool Player::AddObjectToBag(texture_t object) {

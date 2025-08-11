@@ -21,10 +21,15 @@ public:
 	const std::vector<texture_t>& GetBag();
 	size_t GetBagCapacity();
 	bool AddObjectToBag(texture_t object);
+
+	bool HasEffect(const std::type_info& effectType);
 	HealthStatus GetHealthStatus();
 	bool IsNearbyToPos(const float distance, const Vec3f pos);
 	void ApplyHealthDelta(const int delta);
-	bool HasEffect(const std::type_info& effectType);
+	void SetJumpBoost(float boost);
+
+	size_t GetObjectsNum(const texture_t objectType);
+	void RemoveObjects(const texture_t objectType, const size_t number);
 
 	void Init(size_t bagCapacity, HealthStatus healthStatus);
 	void Move(const bool moveAllowed);
@@ -33,6 +38,7 @@ public:
 private:
 	float selfHeight{1.7f};
 	float jumpHeight{4.f};
+	float jumpBoost{1.f};
 	HealthStatus healthStatus{15, 20};
 	std::vector<texture_t> bag{};
 	std::vector<std::unique_ptr<Effect>> effects{};

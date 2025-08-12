@@ -99,24 +99,37 @@ void DrawEffects(const Vec2i offset, const int pixelSize, int gap) {
 	const std::vector<std::unique_ptr<Effect>>& tmp_effects = player.GetEffects();
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	glEnable(GL_TEXTURE_2D);
 	glVertexPointer(2, GL_FLOAT, 0, verticesBagSlot);
 	glTexCoordPointer(2, GL_FLOAT, 0, UVBagSlot);
 		int tmp_count = 0;
 		for(const auto& effect : tmp_effects) {
 			glPushMatrix();
 				glTranslatef(offset.x, offset.y + tmp_count*(pixelSize+gap), 0);
-				glScalef(pixelSize, pixelSize, 1);
-				glColor3f(1, 1, 1);
-				glBindTexture(GL_TEXTURE_2D, effect->GetTexture());
-				glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+				glPushMatrix();
+					glScalef(pixelSize, pixelSize, 1);
+					glColor3f(1, 1, 1);
+
+					glEnable(GL_TEXTURE_2D);
+						glBindTexture(GL_TEXTURE_2D, effect->GetTexture());
+						glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+					glDisable(GL_TEXTURE_2D);
+
+				glPopMatrix();
+
+				const Counter tmp_time = effect->GetRemainingTime();
+				if(tmp_time.GetEnable()) {
+					glColor4f(1, 1, 1, 0.6);
+					const float tmp_ratio =
+						static_cast<float>(tmp_time.GetValue()) / static_cast<float>(tmp_time.GetMax());
+					glScalef(pixelSize, pixelSize*tmp_ratio, 1);
+					glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+				}
 			glPopMatrix();
 
 			tmp_count += 1;
 		}
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	glDisable(GL_TEXTURE_2D);
 }
 
 void Hud::DrawPlayerStatusBar() {

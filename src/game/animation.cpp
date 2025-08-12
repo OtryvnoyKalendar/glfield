@@ -1,4 +1,5 @@
 #include <cstdlib> 
+#include <cassert>
 
 #include "animation.h"
 #include "camera.h"
@@ -8,8 +9,7 @@
 ObjectAnimation animPickingUp;
 
 void ObjectAnimation::SetObject(Object* _object) {
-	if(_object == nullptr)
-		exit(1);
+	assert(_object != nullptr);
 	object = _object;
 	stepsNum = 10;
 	dx = (camera.x - object->pos.x) / stepsNum;

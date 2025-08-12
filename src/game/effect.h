@@ -9,6 +9,7 @@ public:
 	Effect() = delete;
 	bool IsEnd();
 	texture_t GetTexture();
+	Counter GetRemainingTime();
 protected:
 	virtual void Use() = 0;
 private:

@@ -21,6 +21,10 @@ texture_t Effect::GetTexture() {
 	return drawTexture;
 }
 
+Counter Effect::GetRemainingTime() {
+	return remainingTime;
+}
+
 EffectHunger::EffectHunger()
 	: Effect(disableCounterValue, disableCounterValue, 200, texSkillHunger) {};
 EffectSpeedBoost::EffectSpeedBoost()

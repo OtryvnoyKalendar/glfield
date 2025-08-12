@@ -24,6 +24,10 @@ size_t Player::GetObjectsNum(const texture_t objectType) {
 	return std::count(bag.begin(), bag.end(), objectType);
 }
 
+const std::vector<std::unique_ptr<Effect>>& Player::GetEffects() {
+	return effects;
+}
+
 void Player::RemoveObjects(const texture_t objectType, const size_t number) {
 	size_t removed = 0;
 	for (auto& i : bag) {
@@ -46,7 +50,7 @@ void Player::ProcessBagUsage() {
 	if(IsMouseClicked::Left() && (my > dy && my < dy+slotSize))
 		for(size_t i = 0; i < GetBagCapacity(); i++)
 			if((mx > dx + i*slotSize) && (mx < dx + (i+1)*slotSize)) {
-				const size_t necessaryForEffect = 5;
+				const size_t necessaryForEffect = 4;
 				if(bag[i] == texMushroom) {
 					ApplyHealthDelta(2);
 				}

@@ -15,13 +15,14 @@ struct HealthStatus {
 class Player : public LazySingleton<Player> {
 public:
 	float speed{0.f};
-	float normalSpeed{0.1f};
-	float runSpeed{0.25f};
+	float normalSpeed{0.08f};
+	float runSpeed{0.15f};
 
 	const std::vector<texture_t>& GetBag();
 	size_t GetBagCapacity();
 	bool AddObjectToBag(texture_t object);
 
+	const std::vector<std::unique_ptr<Effect>>& GetEffects();
 	bool HasEffect(const std::type_info& effectType);
 	HealthStatus GetHealthStatus();
 	bool IsNearbyToPos(const float distance, const Vec3f pos);

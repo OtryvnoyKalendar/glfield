@@ -1,3 +1,6 @@
+#undef NDEBUG
+#include <cassert>
+
 #include "sound.h"
 #include "gameconf.h"
 
@@ -9,11 +12,8 @@ void SoundInMemory::PlayNext() {
 }
 
 SoundInMemory::SoundInMemory(int _soundsNum)
-	: soundsNum(_soundsNum), currentSound(0) {
-	if(_soundsNum <= 0) {
-		printf("invalid soundsNum");
-		exit(1);
-	}
+		: soundsNum(_soundsNum), currentSound(0) {
+	assert(_soundsNum > 0 && "Invalid soundsNum");
 	soundObjects.resize(_soundsNum+1, sf::Sound(soundBuffer));
 }
 
@@ -27,8 +27,7 @@ AudioId AudioManager::LoadSound(const std::string& soundFilename, int _soundsNum
 	array.push_back(SoundInMemory(_soundsNum));
 
 	std::string currentPath = GetSoundsPath() + soundFilename;
-	if(!array[size].soundBuffer.loadFromFile(currentPath.c_str()))
-		exit(1);
+	assert(array[size].soundBuffer.loadFromFile(currentPath.c_str()));
 
 	isCompleteUpload = false;
 	return size;
@@ -44,33 +43,22 @@ void AudioManager::CompleteUpload() {
 AudioId AudioManager::LoadMusic(const std::string& musicFilename) {
 	const AudioId size = musicsNum;
 	musicsNum += 1;
-	if(musicsNum > musicsNumMax) {
-		printf("limit on the number of music objects uploaded = %ld\n", musicsNumMax);
-		exit(1);
-	}
+	assert(musicsNum <= musicsNumMax && ("limit on the number of music objects uploaded = %ld\n", musicsNumMax));
 
 	std::string currentPath = GetMusicPath() + musicFilename;
-	if(!musics[size].openFromFile(currentPath.c_str()))
-		exit(1);
+	assert(musics[size].openFromFile(currentPath.c_str()));
 
 	return size;
 }
 
 void AudioManager::CheckSoundId(AudioId id) {
-	if(id >= array.size()) {
-		printf("invalid audio id\n");
-		exit(1);
-	}
-	else if(!isCompleteUpload) {
+	assert(id < array.size() && "Invalid audio id");
+	if(!isCompleteUpload)
 		CompleteUpload();
-	}
 }
 
 void AudioManager::CheckMusicId(AudioId id) {
-	if(id >= musics.size()) {
-		printf("invalid audio id\n");
-		exit(1);
-	}
+	assert(id < musics.size() && "Invalid audio id");
 }
 
 void AudioManager::PlayMusic(AudioId id) {

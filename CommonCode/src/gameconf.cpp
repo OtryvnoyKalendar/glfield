@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream> // for std::ifstream
-#include <cstdlib> // for exit
+#undef NDEBUG
+#include <cassert>
 
 #include "gameconf.h"
 
@@ -8,14 +9,10 @@ std::string resourcePath{};
 bool isResourcePathLoaded{false};
 
 void CheckResourcePath() {
-	if(!isResourcePathLoaded) {
-		printf("the path to the resources is not loaded\n");
-		exit(1);
-	}
-	else {
-		if(resourcePath.back() != '/')
-			resourcePath += '/';
-	}
+	assert(isResourcePathLoaded && "The path to the resources is not loaded");
+
+	if(resourcePath.back() != '/')
+		resourcePath += '/';
 }
 
 std::string GetResourcesPath() {
@@ -39,21 +36,16 @@ void LoadConfigInfo() {
 	resourcePath = "";
 	
 	std::ifstream file("game.conf");
-	if(!file) {
-        std::cerr << "error reading game.conf" << std::endl;
-		exit(1);
-	}
-	else {
-		const char* openMessage = "\nLoad resource directory: ";
-		
-		std::string line;
-		getline(file, line); resourcePath += line;
-		while(getline(file, line))
-			std::cout << "unknown settings: "<< line << std::endl;
+	assert(file && "Error reading game.conf");
 
-		std::cout << openMessage << resourcePath << std::endl;
-		file.close();
-	}
+	const char* openMessage = "\nLoad resource directory: ";
+	std::string line;
+	getline(file, line); resourcePath += line;
+	while(getline(file, line))
+		std::cout << "unknown settings: "<< line << std::endl;
+	std::cout << openMessage << resourcePath << std::endl;
+
+	file.close();
 
 	isResourcePathLoaded = true;
 }

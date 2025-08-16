@@ -1,6 +1,7 @@
 #include <cstring> // for memset ?
 #include <iostream>
-#include <cstdlib> // for exit
+#undef NDEBUG
+#include <cassert>
 
 #include "resource.h"
 #include "gameconf.h"
@@ -18,8 +19,7 @@ namespace res {
 		void load(const char* textureFileName, GLuint* _textureID, GLenum wrap, GLenum filter) {
 			sf::Image loadTexture;
 			std::string currentPath = GetTexturesPath() + textureFileName;
-			if(!loadTexture.loadFromFile(currentPath.c_str()))
-				exit(1);
+			assert(loadTexture.loadFromFile(currentPath.c_str()));
 
 			glGenTextures(1, _textureID);
 			glBindTexture(GL_TEXTURE_2D, *_textureID);

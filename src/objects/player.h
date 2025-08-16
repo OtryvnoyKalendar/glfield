@@ -6,6 +6,7 @@
 #include "types.hpp"
 #include "glcore.hpp"
 #include "effect.h"
+#include "texture.h"
 
 struct HealthStatus {
 	int health;
@@ -17,6 +18,7 @@ public:
 	float speed{0.f};
 	float normalSpeed{0.08f};
 	float runSpeed{0.15f};
+	texture_t objectInHand{texUndefined};
 
 	const std::vector<texture_t>& GetBag();
 	size_t GetBagCapacity();
@@ -32,6 +34,13 @@ public:
 	size_t GetObjectsNum(const texture_t objectType);
 	void RemoveObjects(const texture_t objectType, const size_t number);
 
+	void ClearInventory();
+	void ClearEffects();
+	void ClearAll();
+
+	Vec2i GetCursorInventoryPosition();
+	void UpdateCursorInventoryPosition();
+
 	void Init(size_t bagCapacity, HealthStatus healthStatus);
 	void Move(const bool moveAllowed);
 	void ProcessInput();
@@ -40,6 +49,8 @@ private:
 	float selfHeight{1.7f};
 	float jumpHeight{4.f};
 	float jumpBoost{1.f};
+	Vec2i cursorInventoryPosition{};
+
 	HealthStatus healthStatus{15, 20};
 	std::vector<texture_t> bag{};
 	std::vector<std::unique_ptr<Effect>> effects{};

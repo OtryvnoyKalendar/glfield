@@ -37,35 +37,59 @@ void DrawCrosshair(RgbaColor color, const float cursorSize,
 	glDisableClientState(GL_VERTEX_ARRAY);
 }
 
-void Hud::DrawBag() {
-	const size_t tmp_capacity = player.GetBagCapacity();
-	const std::vector<texture_t>& tmp_bag = player.GetBag();
+void DrawFrame() {
+	glColor3ub(160, 146, 116);
+	glLineWidth(3);
+	glDrawArrays(GL_LINE_LOOP, 0, 4);
+}
+
+void DrawCellTexture(const texture_t texture) {
+	if(texture != texUndefined) {
+		glColor3f(1, 1, 1);
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, texture);
+		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+		glDisable(GL_TEXTURE_2D);
+	}
+}
+
+void DrawCellWithTexture(const Vec2i offset, const int pixelSize, const texture_t texture) {
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	glVertexPointer(2, GL_FLOAT, 0, verticesBagSlot);
-	glTexCoordPointer(2, GL_FLOAT, 0, UVBagSlot);
-		for(size_t i = 0; i < tmp_capacity; i++) {
-			glPushMatrix();
-				glTranslatef(bagOffset.x + i*slotPixelSize, bagOffset.y, 0);
-				glScalef(slotPixelSize, slotPixelSize, 1);
-				glColor3ub(110, 95, 73);
-				glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+		glVertexPointer(2, GL_FLOAT, 0, verticesBagSlot);
+		glTexCoordPointer(2, GL_FLOAT, 0, UVBagSlot);
 
-				if(tmp_bag[i] != texUndefined) {
-					glColor3f(1, 1, 1);
-					glEnable(GL_TEXTURE_2D);
-					glBindTexture(GL_TEXTURE_2D, tmp_bag[i]);
-					glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-					glDisable(GL_TEXTURE_2D);
-				}
+		glPushMatrix();
+			glTranslatef(offset.x, offset.y, 0);
+			glScalef(pixelSize, pixelSize, 1);
+			glColor3ub(110, 95, 73);
+			glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
-				glColor3ub(160, 146, 116);
-				glLineWidth(3);
-				glDrawArrays(GL_LINE_LOOP, 0, 4);
-			glPopMatrix();
-		}
+			DrawCellTexture(texture);
+			DrawFrame();
+		glPopMatrix();
+
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+}
+
+void DrawObjectInHand(const int slotPixelSize) {
+	if(player.objectInHand != texUndefined && camera.GetCursorVisible()) {
+		const int mx = sf::Mouse::getPosition(screen.window).x;
+		const int my = sf::Mouse::getPosition(screen.window).y;
+		const int offset = slotPixelSize*3/4;
+		DrawCellWithTexture(Vec2i({mx-offset, my-offset}), slotPixelSize, player.objectInHand);
+	}
+}
+
+void Hud::DrawBag() {
+	const std::vector<texture_t>& tmp_bag = player.GetBag();
+	int tmp_count = 0;
+	for(const texture_t& texture : tmp_bag) {
+		DrawCellWithTexture(Vec2i({bagOffset.x+tmp_count*slotPixelSize, bagOffset.y}),
+				slotPixelSize, texture);
+		tmp_count += 1;
+	}
 }
 
 void DrawHealth(const Vec2i offset, const int scale) {
@@ -105,6 +129,7 @@ void DrawEffects(const Vec2i offset, const int pixelSize, int gap) {
 		for(const auto& effect : tmp_effects) {
 			glPushMatrix();
 				glTranslatef(offset.x, offset.y + tmp_count*(pixelSize+gap), 0);
+
 				glPushMatrix();
 					glScalef(pixelSize, pixelSize, 1);
 					glColor3f(1, 1, 1);
@@ -113,16 +138,17 @@ void DrawEffects(const Vec2i offset, const int pixelSize, int gap) {
 						glBindTexture(GL_TEXTURE_2D, effect->GetTexture());
 						glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 					glDisable(GL_TEXTURE_2D);
-
 				glPopMatrix();
 
 				const Counter tmp_time = effect->GetRemainingTime();
 				if(tmp_time.GetEnable()) {
-					glColor4f(1, 1, 1, 0.6);
+					glDisable(GL_ALPHA_TEST);
+					glColor4f(1, 1, 1, 0.4);
 					const float tmp_ratio =
 						static_cast<float>(tmp_time.GetValue()) / static_cast<float>(tmp_time.GetMax());
 					glScalef(pixelSize, pixelSize*tmp_ratio, 1);
 					glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+					glEnable(GL_ALPHA_TEST);
 				}
 			glPopMatrix();
 
@@ -136,6 +162,7 @@ void Hud::DrawPlayerStatusBar() {
 	DrawBag();
 	DrawHealth(Vec2i({10, 80}), 30);
 	DrawEffects(Vec2i({10, 125}), 70, 10);
+	DrawObjectInHand(slotPixelSize);
 }
 
 void Hud::DrawSelf() {

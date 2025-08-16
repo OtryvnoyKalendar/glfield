@@ -1,5 +1,6 @@
-#include <cstdlib>
 #include <iostream>
+#undef NDEBUG
+#include <cassert>
 
 #include "counter.h"
 
@@ -8,10 +9,7 @@ Counter::Counter(const int max) {
 	maxValue = max;
 	if(!enable)
 		return;
-	if(max < 0) {
-		printf("Counter constructor error: a negative argument\n");
-		exit(1);
-	}
+	assert(max >= 0 && "Counter constructor error: a negative argument");
 }
 
 bool Counter::operator()() {

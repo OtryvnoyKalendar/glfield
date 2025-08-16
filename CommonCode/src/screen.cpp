@@ -46,9 +46,9 @@ void Screen::SetPerspectiveAndLighting() {
 }
 
 Vec2i Screen::GetCenter() {
-	return Vec2i({
+	return {
 		static_cast<int>(width)/2, static_cast<int>(height)/2
-	});
+	};
 }
 
 Screen::Screen() {

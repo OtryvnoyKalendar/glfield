@@ -1,4 +1,4 @@
-#include <cstdlib> 
+#undef NDEBUG
 #include <cassert>
 
 #include "animation.h"
@@ -14,7 +14,7 @@ void ObjectAnimation::SetObject(Object* _object) {
 	stepsNum = 10;
 	dx = (camera.x - object->pos.x) / stepsNum;
 	dy = (camera.y - object->pos.y) / stepsNum;
-	dz = (camera.z - object->pos.z - object->scale -0.2) / stepsNum;
+	dz = (camera.z - object->pos.z - object->scale - 0.2) / stepsNum;
 }
 
 void ObjectAnimation::Play() {

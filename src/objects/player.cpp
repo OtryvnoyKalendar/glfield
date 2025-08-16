@@ -1,5 +1,6 @@
 #include <cmath>
 #include <algorithm> // for std::clamp, std::count
+#include <utility> // for std::swap
 
 #include "screen.hpp"
 #include "camera.h"
@@ -39,37 +40,72 @@ void Player::RemoveObjects(const texture_t objectType, const size_t number) {
 	}
 }
 
+void Player::ClearInventory() {
+	objectInHand = texUndefined;
+	std::fill(bag.begin(), bag.end(), texUndefined);
+}
+
+void Player::ClearEffects() {
+	effects.clear();
+}
+
+void Player::ClearAll() {
+	ClearEffects();
+	ClearInventory();
+}
+
+Vec2i Player::GetCursorInventoryPosition() {
+	return cursorInventoryPosition;
+}
+
+void Player::UpdateCursorInventoryPosition() {
+	const auto pos = sf::Mouse::getPosition(screen.window);
+	cursorInventoryPosition = {pos.x, pos.y};
+}
+
 void Player::ProcessBagUsage() {
 	const int dx = Hud().GetBagOffset().x;
 	const int dy = Hud().GetBagOffset().y;
 	const int slotSize = Hud().GetSlotPixelSize();
 
-	const float mx = sf::Mouse::getPosition(screen.window).x;
-	const float my = sf::Mouse::getPosition(screen.window).y;
+	UpdateCursorInventoryPosition();
+	const int mx = GetCursorInventoryPosition().x;
+	const int my = GetCursorInventoryPosition().y;
 
-	if(IsMouseClicked::Left() && (my > dy && my < dy+slotSize))
-		for(size_t i = 0; i < GetBagCapacity(); i++)
+	texture_t* pickedSlot = nullptr;
+	if(my > dy && my < dy+slotSize)
+		for(int i = 0; i < static_cast<int>(GetBagCapacity()); i++)
 			if((mx > dx + i*slotSize) && (mx < dx + (i+1)*slotSize)) {
-				const size_t necessaryForEffect = 4;
-				if(bag[i] == texMushroom) {
-					ApplyHealthDelta(2);
-				}
-				else if(bag[i] == texFlowerRed) {
-					if(GetObjectsNum(texFlowerRed) >= necessaryForEffect) {
-						RemoveObjects(texFlowerRed, necessaryForEffect);
-						effects.emplace_back(std::make_unique<EffectSpeedBoost>());
-						continue;
-					}
-				}
-				else if(bag[i] == texFlowerYellow) {
-					if(GetObjectsNum(texFlowerYellow) >= necessaryForEffect) {
-						RemoveObjects(texFlowerYellow, necessaryForEffect);
-						effects.emplace_back(std::make_unique<EffectNightVision>());
-						continue;
-					}
-				}
-				bag[i] = texUndefined;
+				pickedSlot = &bag[i];
+				break;
 			}
+
+	if(pickedSlot != nullptr) {
+		if(IsMouseClicked::Left() && *pickedSlot != texUndefined) {
+			const size_t necessaryForEffect = 4;
+			if(*pickedSlot == texMushroom) {
+				ApplyHealthDelta(2);
+			}
+			else if(*pickedSlot == texFlowerRed) {
+				if(GetObjectsNum(texFlowerRed) >= necessaryForEffect) {
+					RemoveObjects(texFlowerRed, necessaryForEffect);
+					effects.emplace_back(std::make_unique<EffectSpeedBoost>());
+					return;
+				}
+			}
+			else if(*pickedSlot == texFlowerYellow) {
+				if(GetObjectsNum(texFlowerYellow) >= necessaryForEffect) {
+					RemoveObjects(texFlowerYellow, necessaryForEffect);
+					effects.emplace_back(std::make_unique<EffectNightVision>());
+					return;
+				}
+			}
+			*pickedSlot = texUndefined;
+		}
+		else if(IsMouseClicked::Right()) {
+			std::swap(objectInHand, *pickedSlot);
+		}
+	}
 }
 
 void Player::SetJumpBoost(float boost) {
@@ -82,8 +118,13 @@ void Player::ProcessInput() {
 	if(!screen.window.hasFocus())
 		return;
 
-	if(IsKeyPressedOnce(sf::Keyboard::Scan::E))
+	if(IsKeyPressedOnce(sf::Keyboard::Scan::E)) {
+		if(camera.GetCursorVisible() == false) {
+			const auto pos = GetCursorInventoryPosition();
+			sf::Mouse::setPosition(sf::Vector2i(pos.x, pos.y), screen.window);
+		}
 		camera.SetCursorVisible(!camera.GetCursorVisible());
+	}
 
 	if(IsKeyPressedOnce(sf::Keyboard::Scan::K))
 		ApplyHealthDelta(-healthStatus.healthMax);
@@ -189,8 +230,13 @@ void Player::Init(size_t bagCapacity, HealthStatus healthStatus) {
 	this->healthStatus = healthStatus;
 
 	InitBag(bagCapacity);
+	ClearAll();
 	if(!HasEffect(typeid(EffectHunger)))
 		effects.emplace_back(std::make_unique<EffectHunger>());
+
+	cursorInventoryPosition = {
+		static_cast<int>(screen.width)/3, static_cast<int>(screen.height)/4
+	};
 }
 
 bool Player::AddObjectToBag(texture_t object) {

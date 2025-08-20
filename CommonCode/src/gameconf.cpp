@@ -1,8 +1,7 @@
 #include <iostream>
 #include <fstream> // for std::ifstream
-#undef NDEBUG
-#include <cassert>
 
+#include "myassert.h"
 #include "gameconf.h"
 
 std::string resourcePath{};

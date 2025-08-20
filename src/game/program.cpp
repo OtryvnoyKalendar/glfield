@@ -24,9 +24,10 @@ static Trees cubetrees;
 Objects objects;
 Map map;
 Player player;
+Hud hud;
 
 void InitPlayer() {
-	size_t bagCapacity = 10;
+	const size_t bagCapacity = 10;
 	player.Init(bagCapacity, HealthStatus({15, 20}));
 	map.SetRandomPosition(camera.x, camera.y, camera.z);
 	Sky().RandomizeSunAngle();
@@ -106,7 +107,7 @@ void Program::RenderGraphics() {
 	
 	DrawShapes();
 	if(!IsSelectMode()) {
-		Hud().DrawSelf();
+		hud.DrawSelf();
 		screen.window.display();
 	}
 }
@@ -141,9 +142,9 @@ void Program::InitScene() {
 	objects.Init();
 	cubetrees.Init(60);
 	Sky::GetInstance().Init();
-	Hud::GetInstance();
 
 	InitPlayer();
+	hud.InitMenuCells();
 }
 
 void Program::InitProgram() {

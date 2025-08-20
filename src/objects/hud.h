@@ -1,18 +1,35 @@
-# pragma once
+#pragma once
+
+#include <array>
 
 #include "singleton.h"
-#include "types.hpp"
+#include "menucraft.h"
+#include "drawmenu.h"
+#include "pixel.h"
 
 class Hud : public LazySingleton<Hud> {
 public:
+	MenuCraft menuCraft{};
+
+	void InitMenuCells();
 	void DrawSelf();
 	const Vec2i& GetBagOffset();
-	const int& GetSlotPixelSize();
+	const int& GetSlotSize();
 private:
 	Vec2i bagOffset{10, 10};
-	int slotPixelSize{60};
+	Vec2i effectsOffset{10, 125};
+	pixel_t slotSize{60};
 
+	static const int cellsMaxNum{100};
+	std::array<MenuCell, cellsMaxNum> inventoryCells{};
+	std::array<MenuCell, cellsMaxNum> effectCells{};
+	MenuCell objectInHandCell{};
+
+	void DrawObjectInHand();
 	void DrawBag();
+	void DrawEffects();
 	void DrawPlayerStatusBar();
 };
+
+extern Hud hud;
 

@@ -26,6 +26,7 @@ public:
 
 	const std::vector<std::unique_ptr<Effect>>& GetEffects();
 	bool HasEffect(const std::type_info& effectType);
+	size_t GetEffectsNum();
 	HealthStatus GetHealthStatus();
 	bool IsNearbyToPos(const float distance, const Vec3f pos);
 	void ApplyHealthDelta(const int delta);

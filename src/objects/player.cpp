@@ -29,6 +29,10 @@ const std::vector<std::unique_ptr<Effect>>& Player::GetEffects() {
 	return effects;
 }
 
+size_t Player::GetEffectsNum() {
+	return effects.size();
+}
+
 void Player::RemoveObjects(const texture_t objectType, const size_t number) {
 	size_t removed = 0;
 	for (auto& i : bag) {
@@ -64,9 +68,9 @@ void Player::UpdateCursorInventoryPosition() {
 }
 
 void Player::ProcessBagUsage() {
-	const int dx = Hud().GetBagOffset().x;
-	const int dy = Hud().GetBagOffset().y;
-	const int slotSize = Hud().GetSlotPixelSize();
+	const int dx = hud.GetBagOffset().x;
+	const int dy = hud.GetBagOffset().y;
+	const int slotSize = hud.GetSlotSize();
 
 	UpdateCursorInventoryPosition();
 	const int mx = GetCursorInventoryPosition().x;
@@ -99,6 +103,10 @@ void Player::ProcessBagUsage() {
 					effects.emplace_back(std::make_unique<EffectNightVision>());
 					return;
 				}
+			}
+			else if(*pickedSlot == texMortar) {
+				hud.menuCraft.isActive = !hud.menuCraft.isActive;
+				return;
 			}
 			*pickedSlot = texUndefined;
 		}
@@ -217,6 +225,7 @@ HealthStatus Player::GetHealthStatus() {
 
 void Player::InitBag(size_t bagCapacity) {
 	bag.assign(bagCapacity, texUndefined);
+	bag[0] = texMortar;
 }
 
 bool Player::HasEffect(const std::type_info& effectType) {
@@ -229,8 +238,8 @@ bool Player::HasEffect(const std::type_info& effectType) {
 void Player::Init(size_t bagCapacity, HealthStatus healthStatus) {
 	this->healthStatus = healthStatus;
 
-	InitBag(bagCapacity);
 	ClearAll();
+	InitBag(bagCapacity);
 	if(!HasEffect(typeid(EffectHunger)))
 		effects.emplace_back(std::make_unique<EffectHunger>());
 

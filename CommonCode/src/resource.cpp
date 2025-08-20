@@ -1,8 +1,7 @@
 #include <cstring> // for memset ?
 #include <iostream>
-#undef NDEBUG
-#include <cassert>
 
+#include "myassert.h"
 #include "resource.h"
 #include "gameconf.h"
 

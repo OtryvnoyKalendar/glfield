@@ -1,6 +1,6 @@
 #pragma once
 
-struct Cell {
-	float x, y, z;
-};
+#include "types.hpp"
+
+using Cell = Vec3f;
 

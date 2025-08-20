@@ -1,7 +1,6 @@
 #include <iostream>
-#undef NDEBUG
-#include <cassert>
 
+#include "myassert.h"
 #include "counter.h"
 
 Counter::Counter(const int max) {

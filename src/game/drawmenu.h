@@ -9,7 +9,7 @@
 void DrawRectangle(const Vec2i offset, const Vec2i pixelSizes);
 
 enum class CellType {
-	Inventory, Hand, CraftInput, CraftOutput, Effect,
+	Undefined, Inventory, Hand, CraftInput, CraftOutput, Effect, Indicator,
 };
 
 class MenuCell {
@@ -22,8 +22,9 @@ public:
 	CellType GetType();
 	pixel_t GetSize();
 
-	void ProcessWithTexture(const texture_t texture);
-	void DrawAsTexture(const texture_t texture, std::function<void()> drawingEffectFunction);
+	void ProcessWithTexture(texture_t* texture);
+	void DrawAsTexture(const texture_t texture, std::function<void()> effectBeforeDraw,
+		std::function<void()> effectAfterDraw);
 private:
 	CellType type{CellType::Inventory};
 	Vec2i offset{};

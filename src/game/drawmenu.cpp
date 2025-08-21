@@ -1,6 +1,7 @@
 #include "drawmenu.h"
 #include "texture.h"
 #include "myassert.h"
+#include "pickedslot.h"
 
 namespace {
 	GLfloat verticesCell[] = {
@@ -81,7 +82,8 @@ CellType MenuCell::GetType() {
 	return type;
 }
 
-void MenuCell::ProcessWithTexture(const texture_t texture) {
+void MenuCell::ProcessWithTexture(texture_t* texture) {
+	pickedSlot.Set(offset, size, type, texture);
 	EnableCellGlState();
 		glPushMatrix();
 			glTranslatef(offset.x, offset.y, 0);
@@ -89,13 +91,14 @@ void MenuCell::ProcessWithTexture(const texture_t texture) {
 			glColor3ub(110, 95, 73);
 			glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
-			DrawCellTexture(texture);
+			DrawCellTexture(*texture);
 			DrawFrame();
 		glPopMatrix();
 	DisableCellGlState();
 }
 
-void MenuCell::DrawAsTexture(const texture_t texture, std::function<void()> drawingEffectFunction) {
+void MenuCell::DrawAsTexture(const texture_t texture, std::function<void()> effectBeforeDraw,
+		std::function<void()> effectAfterDraw) {
 	EnableCellGlState();
 		glPushMatrix();
 			glTranslatef(offset.x, offset.y, 0);
@@ -103,14 +106,15 @@ void MenuCell::DrawAsTexture(const texture_t texture, std::function<void()> draw
 			glPushMatrix();
 				glScalef(size, size, 1);
 				glColor3f(1, 1, 1);
+				effectBeforeDraw();
 
 				glEnable(GL_TEXTURE_2D);
 					glBindTexture(GL_TEXTURE_2D, texture);
 					glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 				glDisable(GL_TEXTURE_2D);
 			glPopMatrix();
+			effectAfterDraw();
 
-			drawingEffectFunction();
 		glPopMatrix();
 	DisableCellGlState();
 }

@@ -11,7 +11,7 @@ class Hud : public LazySingleton<Hud> {
 public:
 	MenuCraft menuCraft{};
 
-	void InitMenuCells();
+	void Init();
 	void DrawSelf();
 	const Vec2i& GetBagOffset();
 	const int& GetSlotSize();
@@ -25,6 +25,7 @@ private:
 	std::array<MenuCell, cellsMaxNum> effectCells{};
 	MenuCell objectInHandCell{};
 
+	void InitMenuCells();
 	void DrawObjectInHand();
 	void DrawBag();
 	void DrawEffects();

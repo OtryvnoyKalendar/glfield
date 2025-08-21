@@ -10,6 +10,7 @@
 #include "onepress.h"
 #include "hud.h"
 #include "texture.h"
+#include "pickedslot.h"
 
 bool Player::IsNearbyToPos(const float distance, const Vec3f pos) {
 	using namespace std;
@@ -68,52 +69,60 @@ void Player::UpdateCursorInventoryPosition() {
 }
 
 void Player::ProcessBagUsage() {
-	const int dx = hud.GetBagOffset().x;
-	const int dy = hud.GetBagOffset().y;
-	const int slotSize = hud.GetSlotSize();
-
 	UpdateCursorInventoryPosition();
-	const int mx = GetCursorInventoryPosition().x;
-	const int my = GetCursorInventoryPosition().y;
+	texture_t* tmp_pickedSlot = pickedSlot.GetTexture();
+	const CellType tmp_type = pickedSlot.GetType();
 
-	texture_t* pickedSlot = nullptr;
-	if(my > dy && my < dy+slotSize)
-		for(int i = 0; i < static_cast<int>(GetBagCapacity()); i++)
-			if((mx > dx + i*slotSize) && (mx < dx + (i+1)*slotSize)) {
-				pickedSlot = &bag[i];
-				break;
-			}
-
-	if(pickedSlot != nullptr) {
-		if(IsMouseClicked::Left() && *pickedSlot != texUndefined) {
-			const size_t necessaryForEffect = 4;
-			if(*pickedSlot == texMushroom) {
-				ApplyHealthDelta(2);
-			}
-			else if(*pickedSlot == texFlowerRed) {
-				if(GetObjectsNum(texFlowerRed) >= necessaryForEffect) {
-					RemoveObjects(texFlowerRed, necessaryForEffect);
-					effects.emplace_back(std::make_unique<EffectSpeedBoost>());
+	if(tmp_pickedSlot != nullptr) {
+		if(IsMouseClicked::Left()) {
+			if(*tmp_pickedSlot != texUndefined && tmp_type == CellType::Inventory) {
+				const size_t necessaryForEffect = 6;
+				const int mushroomTreatment = 2;
+				const int potionLifeTreatment = 10;
+				if(*tmp_pickedSlot == texMushroom) {
+					ApplyHealthDelta(mushroomTreatment);
+				}
+				else if(*tmp_pickedSlot == texFlowerRed) {
+					if(GetObjectsNum(texFlowerRed) >= necessaryForEffect) {
+						RemoveObjects(texFlowerRed, necessaryForEffect);
+						effects.emplace_back(std::make_unique<EffectSpeedBoost>());
+						return;
+					}
+				}
+				else if(*tmp_pickedSlot == texFlowerYellow) {
+					if(GetObjectsNum(texFlowerYellow) >= necessaryForEffect) {
+						RemoveObjects(texFlowerYellow, necessaryForEffect);
+						effects.emplace_back(std::make_unique<EffectNightVision>());
+						return;
+					}
+				}
+				else if(*tmp_pickedSlot == texMortar) {
+					hud.menuCraft.isActive = !hud.menuCraft.isActive;
 					return;
 				}
-			}
-			else if(*pickedSlot == texFlowerYellow) {
-				if(GetObjectsNum(texFlowerYellow) >= necessaryForEffect) {
-					RemoveObjects(texFlowerYellow, necessaryForEffect);
+				else if(*tmp_pickedSlot == texPotionEye) {
 					effects.emplace_back(std::make_unique<EffectNightVision>());
-					return;
 				}
-			}
-			else if(*pickedSlot == texMortar) {
-				hud.menuCraft.isActive = !hud.menuCraft.isActive;
+				else if(*tmp_pickedSlot == texPotionSpeed) {
+					effects.emplace_back(std::make_unique<EffectSpeedBoost>());
+				}
+				else if(*tmp_pickedSlot == texPotionLife) {
+					ApplyHealthDelta(potionLifeTreatment);
+				}
+				*tmp_pickedSlot = texUndefined;
 				return;
 			}
-			*pickedSlot = texUndefined;
 		}
 		else if(IsMouseClicked::Right()) {
-			std::swap(objectInHand, *pickedSlot);
+			if(tmp_type != CellType::CraftOutput && !(tmp_type == CellType::CraftInput && objectInHand == texMortar)) {
+				std::swap(objectInHand, *tmp_pickedSlot);
+				return;
+			}
+			hud.menuCraft.ProcessCraft();
 		}
 	}
+
+	pickedSlot.Clear();
 }
 
 void Player::SetJumpBoost(float boost) {
@@ -209,10 +218,6 @@ void Player::ApplyHealthDelta(const int delta) {
 		OnDeath();
 
 	healthStatus.health = std::clamp(healthStatus.health, 0, healthStatus.healthMax);
-}
-
-const std::vector<texture_t>& Player::GetBag() {
-	return bag;
 }
 
 size_t Player::GetBagCapacity() {

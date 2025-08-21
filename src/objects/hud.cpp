@@ -35,8 +35,13 @@ void Hud::DrawObjectInHand() {
 		const pixel_t my = sf::Mouse::getPosition(screen.window).y;
 		const pixel_t offset = slotSize*3/4;
 		objectInHandCell.SetOffset({mx-offset, my-offset});
-		objectInHandCell.ProcessWithTexture(player.objectInHand);
+		objectInHandCell.ProcessWithTexture(&player.objectInHand);
 	}
+}
+
+void Hud::Init() {
+	menuCraft.InitCrafts();
+	InitMenuCells();
 }
 
 void Hud::InitMenuCells() {
@@ -61,10 +66,9 @@ void Hud::InitMenuCells() {
 }
 
 void Hud::DrawBag() {
-	const std::vector<texture_t>& tmp_bag = player.GetBag();
 	int tmp_count = 0;
-	for(const texture_t& texture : tmp_bag) {
-		inventoryCells[tmp_count].ProcessWithTexture(texture);
+	for(texture_t& texture : player.bag) {
+		inventoryCells[tmp_count].ProcessWithTexture(&texture);
 		tmp_count += 1;
 	}
 }
@@ -121,6 +125,7 @@ void Hud::DrawEffects() {
 		const pixel_t tmp_size = effectCells[tmp_count].GetSize();
 		effectCells[tmp_count].DrawAsTexture(
 			effect->GetTexture(),
+			[](){},
 			[&]() {DrawEffectIndicator(tmp_ratio, tmp_size);}
 		);
 

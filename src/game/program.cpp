@@ -30,6 +30,7 @@ void InitPlayer() {
 	const size_t bagCapacity = 10;
 	player.Init(bagCapacity, HealthStatus({15, 20}));
 	map.SetRandomPosition(camera.x, camera.y, camera.z);
+	hud.menuCraft.ClearCraftTable();
 	Sky().RandomizeSunAngle();
 }
 
@@ -144,7 +145,7 @@ void Program::InitScene() {
 	Sky::GetInstance().Init();
 
 	InitPlayer();
-	hud.InitMenuCells();
+	hud.Init();
 }
 
 void Program::InitProgram() {

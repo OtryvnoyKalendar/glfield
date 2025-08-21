@@ -41,7 +41,7 @@ void AudioManager::CompleteUpload() {
 AudioId AudioManager::LoadMusic(const std::string& musicFilename) {
 	const AudioId size = musicsNum;
 	musicsNum += 1;
-	assert(musicsNum <= musicsNumMax && ("limit on the number of music objects uploaded = %ld\n", musicsNumMax));
+	assert(musicsNum <= musicsNumMax && "The limit on the number of music objects uploaded has been exceeded");
 
 	std::string currentPath = GetMusicPath() + musicFilename;
 	assert(musics[size].openFromFile(currentPath.c_str()));

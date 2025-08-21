@@ -22,8 +22,10 @@ public:
 
 	MenuCraft();
 
+	void ProcessCraft();
+	void InitCrafts();
+	void ClearCraftTable();
 	void DrawSelf(const pixel_t slotSize);
-	const Vec2i& GetOffset();
 private:
 	Vec2i offset;
 	pixel_t gap{5};
@@ -31,8 +33,10 @@ private:
 	std::vector<CraftingRecipe> recipes;
 	std::array<MenuCell, 9> craftInputCells{};
 	MenuCell craftOutputCell{};
+	MenuCell recipeReadinessIndicator{};
 
 	void CalcItemOutput();
 	void CalcOffset(const Vec2i menuSizes, const pixel_t slotSize);
+	float GetRecipeReadinessRatio();
 };
 

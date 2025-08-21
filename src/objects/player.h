@@ -19,8 +19,8 @@ public:
 	float normalSpeed{0.08f};
 	float runSpeed{0.15f};
 	texture_t objectInHand{texUndefined};
+	std::vector<texture_t> bag{};
 
-	const std::vector<texture_t>& GetBag();
 	size_t GetBagCapacity();
 	bool AddObjectToBag(texture_t object);
 
@@ -34,13 +34,11 @@ public:
 
 	size_t GetObjectsNum(const texture_t objectType);
 	void RemoveObjects(const texture_t objectType, const size_t number);
+	Vec2i GetCursorInventoryPosition();
 
 	void ClearInventory();
 	void ClearEffects();
 	void ClearAll();
-
-	Vec2i GetCursorInventoryPosition();
-	void UpdateCursorInventoryPosition();
 
 	void Init(size_t bagCapacity, HealthStatus healthStatus);
 	void Move(const bool moveAllowed);
@@ -53,13 +51,13 @@ private:
 	Vec2i cursorInventoryPosition{};
 
 	HealthStatus healthStatus{15, 20};
-	std::vector<texture_t> bag{};
 	std::vector<std::unique_ptr<Effect>> effects{};
 
 	void OnDeath();
 	void InitBag(size_t bagCapacity);
 	void SetHeight(bool jumpAllowed);
 	void ProcessBagUsage();
+	void UpdateCursorInventoryPosition();
 };
 
 extern Player player; 

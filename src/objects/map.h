@@ -13,11 +13,13 @@ public:
 
 	void Init(int _hillsNum=12);
 	void DrawSelf();
-	bool IsCoordExist(float x, float y);
-	float GetHeight(float x, float y);
+	bool IsCoordExist(const float x, const float y);
+	float GetHeight(const float x, const float y);
+	float GetHeight(const float x, const float y, const bool isPlayerCheck);
 	Map();
 
 	void NormalizeHeight(const float xPos, const float yPos, float& zPos);
+	void NormalizeHeight(const float xPos, const float yPos, float& zPos, const bool isPlayerCheck);
 	void LiftCameraOffGround(const float height);
 	void SetRandomPosition(float& xPos, float& yPos, float& zPos);
 	Vec2f GetRandomPosition();

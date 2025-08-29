@@ -17,17 +17,29 @@ void Map::CreateHill(int x, int y, int rad, int hillHeight) {
 			}
 }
 
-float Map::GetHeight(float x, float y) {
-	if(!IsCoordExist(x, y))
+float Map::GetHeight(const float x, const float y) {
+	return GetHeight(x, y, false);
+}
+
+float Map::GetHeight(const float x, const float y, const bool isPlayerCheck) {
+	const int ix = static_cast<int>(x);
+	const int iy = static_cast<int>(y);
+
+	if(!IsCoordExist(ix+isPlayerCheck, iy+isPlayerCheck))
 		return 0;
 
-	int ix = static_cast<int>(x);
-	int iy = static_cast<int>(y);
+	const float dx1 = (1.f - (x-ix));
+	const float dx = (x-ix);
 
-	float h1 = (1-(x - ix))*arrayCells[ix][iy].z + (x - ix)*arrayCells[ix+1][iy].z;
-	float h2 = (1-(x - ix))*arrayCells[ix][iy+1].z + (x - ix)*arrayCells[ix+1][iy+1].z;
+	const float dy1 = (1.f - (y-iy));
+	const float dy = (y-iy);
 
-	return (1-(y-iy))*h1 + (y-iy)*h2;
+	const float h1 = dx1 * arrayCells[ix][iy].z
+		+ dx * arrayCells[ix+1][iy].z;
+	const float h2 = dx1 * arrayCells[ix][iy+1].z
+		+ dx * arrayCells[ix+1][iy+1].z;
+
+	return dy1*h1 + dy*h2;
 }
 
 void Map::Init(int _hillsNum) {
@@ -58,7 +70,7 @@ void Map::Init(int _hillsNum) {
 	}
 
 	for(int i = 0; i < hillsNum; i++)
-		CreateHill(GetRand(0,width), GetRand(0,height), GetRand(0, 50), GetRand(0, 10));
+		CreateHill(GetRand(0, width), GetRand(0, height), GetRand(0, 50), GetRand(0, 10));
 
 	for(int i = 0; i < width-1; i++)
 		for(int j = 0; j < height-1; j++)
@@ -69,7 +81,7 @@ Map::Map() {
 	Init();
 }
 
-bool Map::IsCoordExist(float x, float y) {
+bool Map::IsCoordExist(const float x, const float y) {
 	return x > 0 && x < width && y >= 0 && y < height;
 }
 
@@ -91,7 +103,6 @@ void Map::DrawSelf() {
 }
 
 void Map::CalcNormals(Cell a, Cell b, Cell c, Cell* n) {
-	float wrki;
 	Cell v1, v2;
 
 	v1.x = a.x - b.x;
@@ -106,19 +117,24 @@ void Map::CalcNormals(Cell a, Cell b, Cell c, Cell* n) {
 	n->y = v1.z * v2.x - v1.x * v2.z;
 	n->z = v1.x * v2.y - v1.y * v2.x;
 
-	wrki = std::sqrt(std::pow(n->x, 2) + std::pow(n->y, 2) + std::pow(n->z, 2));
+	using namespace std;
+	const float tmp_wrki = sqrt(pow(n->x, 2) + pow(n->y, 2) + pow(n->z, 2));
 
-	n->x /= wrki;
-	n->y /= wrki;
-	n->z /= wrki;
+	n->x /= tmp_wrki;
+	n->y /= tmp_wrki;
+	n->z /= tmp_wrki;
 }
 
 void Map::NormalizeHeight(const float xPos, const float yPos, float& zPos) {
-	zPos = GetHeight(xPos, yPos) - 0.1;
+	NormalizeHeight(xPos, yPos, zPos, false);
+}
+
+void Map::NormalizeHeight(const float xPos, const float yPos, float& zPos, const bool isPlayerCheck) {
+	zPos = GetHeight(xPos, yPos, isPlayerCheck) - 0.1;
 }
 
 void Map::LiftCameraOffGround(const float height) {
-	NormalizeHeight(camera.x, camera.y, camera.z);
+	NormalizeHeight(camera.x, camera.y, camera.z, true);
 	camera.z += height;
 }
 

@@ -11,10 +11,10 @@
 #include "hud.h"
 #include "texture.h"
 #include "pickedslot.h"
+#include "cubetree.h"
 
 bool Player::IsNearbyToPos(const float distance, const Vec3f pos) {
 	using namespace std;
-
 	return sqrt(
 		pow(pos.x - camera.x, 2) +
 		pow(pos.y - camera.y, 2) +
@@ -189,8 +189,15 @@ void Player::Move(const bool moveAllowed) {
 			moveRight = 1;
 	}
 
-	if(moveAllowed)
-		camera.MoveDirection(moveForvard, moveRight, speed);
+	if(moveAllowed) {
+		const float mouseSensitivity = 5.5f;
+		camera.AutoTurnByMouse(mouseSensitivity);
+
+		const Vec2f tmp_offset = camera.GetMovementOffset(moveForvard, moveRight);
+		if(!cubetrees.IsTreeAt({camera.x + tmp_offset.x, camera.y + tmp_offset.y}))
+			camera.MoveDirection(moveForvard, moveRight, speed);
+	}
+
 	SetHeight(moveAllowed);
 	camera.Apply();
 

@@ -11,10 +11,9 @@ public:
 	void ApplySettings();
 
 	void Init(Vec3f position, Vec2f rotation, float speed, bool cursorVisible);
-	void Rotate(float xAngle, float zAngle);
-	void AutoTurnByMouse(float mouseSensitivity);
-	void MoveDirection(int moveForvard, int moveRight);
-	void MoveDirection(int moveForvard, int moveRight, float _speed);
+	void AutoTurnByMouse(const float mouseSensitivity);
+	Vec2f GetMovementOffset(const int moveForvard, const int moveRight);
+	void MoveDirection(const int moveForvard, const int moveRight, float speed);
 	void SetCursorVisible(bool visible);
 
 	bool GetCursorVisible();
@@ -25,6 +24,8 @@ public:
 private:
 	float xRot, zRot; // Grad
 	bool cursorVisible;
+
+	void Rotate(float xAngle, float zAngle);
 };
 
 extern Camera camera;

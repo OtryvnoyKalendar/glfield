@@ -35,7 +35,7 @@ void Camera::Apply() {
 	glTranslatef(-x, -y, -z);
 }
 
-void Camera::AutoTurnByMouse(float mouseSensitivity) {
+void Camera::AutoTurnByMouse(const float mouseSensitivity) {
 	Vec2i cursor{};
 	cursor.x = sf::Mouse::getPosition(screen.window).x;
 	cursor.y = sf::Mouse::getPosition(screen.window).y;
@@ -77,34 +77,36 @@ float Camera::GetZRotRad() {
 	return zRot * (M_PI / 180.f);
 }
 
-void Camera::MoveDirection(int moveForvard, int moveRight) {
-	float angle = -zRot / 180.f * M_PI;
+Vec2f Camera::GetMovementOffset(const int moveForvard, const int moveRight) {
+	float tmp_angle = -zRot / 180.f * M_PI;
 	float currentSpeed{speed};
 	
 	if(moveForvard > 0) {
-		angle += moveRight > 0 ? M_PI_4 : (moveRight < 0 ? -M_PI_4 : 0);
+		tmp_angle += moveRight > 0 ? M_PI_4 : (moveRight < 0 ? -M_PI_4 : 0);
 	}
 	else if(moveForvard < 0) {
-		angle += M_PI + (moveRight > 0 ? -M_PI_4 : (moveRight < 0 ? M_PI_4 : 0));
+		tmp_angle += M_PI + (moveRight > 0 ? -M_PI_4 : (moveRight < 0 ? M_PI_4 : 0));
 	}
 	else {
-		angle += moveRight > 0 ? M_PI_2 : -M_PI_2;
+		tmp_angle += moveRight > 0 ? M_PI_2 : -M_PI_2;
 		if(moveRight == 0)
 			currentSpeed = 0;
 	}
 	
-	if(currentSpeed != 0) {
-		x += sin(angle) * currentSpeed;
-		y += cos(angle) * currentSpeed;
-	}
-
-	AutoTurnByMouse(6.0);
+	if(currentSpeed != 0)
+		return {
+			std::sin(tmp_angle) * currentSpeed,
+			std::cos(tmp_angle) * currentSpeed,
+		};
+	else
+		return {};
 }
 
-void Camera::MoveDirection(int moveForvard, int moveRight, float _speed) {
-	const float speedSave{speed};
-	speed = _speed;
-	MoveDirection(moveForvard, moveRight);
-	speed = speedSave;
+void Camera::MoveDirection(const int moveForvard, const int moveRight, float speed) {
+	const float tmp_speedSave{speed};
+	this->speed = speed;
+	const Vec2f tmp_offset = GetMovementOffset(moveForvard, moveRight);
+	x += tmp_offset.x; y += tmp_offset.y;
+	speed = tmp_speedSave;
 }
 

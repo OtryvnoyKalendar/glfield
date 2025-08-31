@@ -20,7 +20,7 @@ Screen screen(900, 700, "Amazing field");
 Camera camera;
 AudioManager audio;
 
-static Trees cubetrees;
+Trees cubetrees;
 Objects objects;
 Map map;
 Player player;

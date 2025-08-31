@@ -59,7 +59,9 @@ void Tree::DrawSelf() {
 	glDisable(GL_TEXTURE_2D);
 }
 
-void Tree::Init(float x, float y) {
+void Tree::Init(Vec2f coord) {
+	float& x = coord.x;
+	float& y = coord.y;
 	float z = map.GetHeight(x+0.5, y+0.5) - 0.5;
 	cubes = std::make_unique<Object[]>(cubesNum);
 
@@ -94,11 +96,26 @@ void Trees::Init(int treesNum) {
 	this->treesNum = treesNum;
 	trees = std::make_unique<Tree[]>(treesNum);
 	for(int i = 0; i < treesNum; i++)
-		trees[i].Init(GetRand(2, map.width-2), GetRand(2, map.height-2));
+		trees[i].Init({
+			static_cast<float>(GetRand(2, map.width-2)), static_cast<float>(GetRand(2, map.height-2))
+		});
 }
 
 void Trees::DrawSelf() {
 	for(int i = 0; i < treesNum; i++)
 		trees[i].DrawSelf();
+}
+
+bool Trees::IsTreeAt(Vec2f pos) {
+	for(int i = 0; i < treesNum; i++) {
+		const Vec3f& tmp_treePos = trees[i].cubes[0].pos;
+		const float tmp_paddingLowerBound = 0.4f;
+		const float tmp_paddingUpperBound = 1.f + tmp_paddingLowerBound;
+		if((pos.x+tmp_paddingLowerBound >= tmp_treePos.x && pos.x <= tmp_treePos.x+tmp_paddingUpperBound)
+				&& (pos.y+tmp_paddingLowerBound >= tmp_treePos.y && pos.y <= tmp_treePos.y+tmp_paddingUpperBound))
+			return true;
+	}
+
+	return false;
 }
 
